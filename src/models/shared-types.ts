@@ -1,0 +1,1 @@
+export type PriceRange = [number, number]; // [from, to]

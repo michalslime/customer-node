@@ -1,0 +1,10 @@
+import { Coin } from "src/models/bybit-investing";
+
+export type CommandType = 'SET_STOP_LOSS' | 'CLOSE_POSITION' | 'SET_SOFT_STOP_LOSS' | 'SET_PNL_STOP_LOSS' | 'OPEN_POSITION';
+
+export class Command<T> {
+    createdTimestamp: number;
+    coin: Coin;
+    type: CommandType;
+    payload: T;
+}
