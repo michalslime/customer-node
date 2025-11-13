@@ -1,11 +1,11 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Req } from '@nestjs/common';
-import { ActivePosition } from './models/active-position';
+import { Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
 import type { Coin } from './models/bybit-investing';
 import { BybitInvestingService } from './services/bybit-investing.service';
 import { ErrorsService } from './services/errors.service';
 import { InvestingService } from './services/investing.service';
 import { ErrorCodes } from './others/error-codes.enum';
 import { CommandsService } from './services/commands.service';
+import { Position } from './models/position';
 
 @Controller()
 export class AppController {
@@ -16,7 +16,7 @@ export class AppController {
     ) { }
 
     @Post('ping')
-    async ping(): Promise<void> {
+    async handlePing(): Promise<void> {
         try {
             const commands = await this.commandsService.getCommandsAsync();
 
@@ -60,9 +60,9 @@ export class AppController {
     }
 
     @Get('positions')
-    async getOpenPositions(): Promise<ActivePosition[]> {
+    async getOpenPositions(): Promise<Position[]> {
         try {
-            const positions = await this.investingService.getActivePositionsAsync();
+            const positions = await this.investingService.getPositionsAsync();
             return positions
         } catch (error: any) {
             this.handleError(error);

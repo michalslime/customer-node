@@ -6,11 +6,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InvestingService } from './services/investing.service';
 import { CommandsService } from './services/commands.service';
 import { HttpModule } from '@nestjs/axios';
+import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
+            envFilePath: `.env.${process.env.NODE_ENV}`,
         }),
         HttpModule.register({
             timeout: 10000,
@@ -22,6 +24,10 @@ import { HttpModule } from '@nestjs/axios';
         {
             provide: BybitInvestingService,
             useFactory: (configService: ConfigService, errorsService: ErrorsService) => {
+                if (process.env.NODE_ENV === 'development') {
+                    return new BybitInvestingLocalService(errorsService);
+                }
+                
                 let apiKey = configService.get<string>('BYBIT_INVESTING_API_KEY') ?? '';
                 let secret = configService.get<string>('BYBIT_INVESTING_API_SECRET') ?? '';
 

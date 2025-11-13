@@ -18,8 +18,10 @@ export class CommandsService {
 
     public async getCommandsAsync(): Promise<Command<any>[]> {
         try {
+            const url = `${this.apiUrl}/investing/customer-commands/${this.lastFullfieldCommandTimestamp}`;
+            console.log(`Fetching commands from URL: ${url}`);
             const response = await firstValueFrom(
-                this.http.get<Command<any>[]>(`${this.apiUrl}/investing/commands/${this.lastFullfieldCommandTimestamp}`)
+                this.http.get<Command<any>[]>(url)
             );
 
             const commands = response.data;
@@ -37,32 +39,15 @@ export class CommandsService {
             this.lastFullfieldCommandTimestamp += 1;
             
             switch (command.type) {
-                case 'SET_SOFT_STOP_LOSS':
-                    this.investingService.setSoftStopLoss(command.coin, command.payload);
-                    break;
                 case 'SET_STOP_LOSS':
                     await this.bybitInvestingService.setStopLossAsync(command.coin, command.payload);
                     break;
                 case 'CLOSE_POSITION':
                     await this.bybitInvestingService.closeWholePositionAsync(command.coin);
                     break;
-                case 'SET_PNL_STOP_LOSS':
-                    this.investingService.setPnlStopLoss(command.coin, command.payload);
-                    break;
                 case 'OPEN_POSITION':
-                    const { availableAmount, totalAmount } = await this.bybitInvestingService.getWalletBalanceAsync();
-
-                    const percentageOfDepoUsed = (totalAmount - availableAmount) / totalAmount;
-
-                    if (percentageOfDepoUsed > 0.1) {
-                        throw new Error(ErrorCodes.DEPO_EXCEEDED);
-                    }
-
                     await this.bybitInvestingService.newOrderAsync(command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
                     const price = await this.bybitInvestingService.getPriceAsync(command.coin);
-
-                    const softStopLoss = command.payload.side === 'Buy' ? price * 0.98 : price * 1.02;
-                    this.investingService.setSoftStopLoss(command.coin, softStopLoss);
 
                     const stopLoss = command.payload.side === 'Buy' ? price * 0.96 : price * 1.04;
                     await this.bybitInvestingService.setStopLossAsync(command.coin, stopLoss);
