@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ErrorsService } from './services/errors.service';
 import { BybitInvestingService } from './services/bybit-investing.service';
@@ -7,6 +7,7 @@ import { InvestingService } from './services/investing.service';
 import { CommandsService } from './services/commands.service';
 import { HttpModule } from '@nestjs/axios';
 import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
+import { FillCommonIdMiddleware } from './npm-package-candidate/fill-common-id.middleware';
 
 @Module({
     imports: [
@@ -39,4 +40,9 @@ import { BybitInvestingLocalService } from './services/bybit-investing-local.ser
         CommandsService
     ],
 })
-export class AppModule { }
+export class AppModule { 
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(FillCommonIdMiddleware).forRoutes('*');
+    }
+}
+

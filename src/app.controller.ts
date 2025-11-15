@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Req } from '@nestjs/common';
 import type { Coin } from './models/bybit-investing';
 import { BybitInvestingService } from './services/bybit-investing.service';
 import { ErrorsService } from './services/errors.service';
@@ -6,6 +6,7 @@ import { InvestingService } from './services/investing.service';
 import { ErrorCodes } from './others/error-codes.enum';
 import { CommandsService } from './services/commands.service';
 import { Position } from './models/position';
+import type { Request } from 'express';
 
 @Controller()
 export class AppController {
@@ -16,61 +17,61 @@ export class AppController {
     ) { }
 
     @Post('ping')
-    async handlePing(): Promise<void> {
+    async handlePing(@Req() request: Request): Promise<void> {
         try {
-            const commands = await this.commandsService.getCommandsAsync();
+            const commands = await this.commandsService.getCommandsAsync(request.commonId);
 
-            await this.commandsService.processFetchedCommandsAsync(commands);
+            await this.commandsService.processFetchedCommandsAsync(commands, request.commonId);
 
             return;
         } catch (error: any) {
-            this.handleError(error);
+            this.handleError(error, request.commonId);
         }
     }
 
     @Get('price/:coin')
-    async getPrice(@Param('coin') coin: Coin): Promise<number> {
+    async getPrice(@Req() request: Request, @Param('coin') coin: Coin): Promise<number> {
         console.log(coin);
         try {
             const price = await this.bybitInvestingService.getPriceAsync(coin);
             return price || 0;
         } catch (error: any) {
-            this.handleError(error);
+            this.handleError(error, request.commonId);
         }
     }
 
     @Get('wallet-balance/total')
-    async getWalletTotalBalance(): Promise<number> {
+    async getWalletTotalBalance(@Req() request: Request): Promise<number> {
         try {
             const wallet = await this.bybitInvestingService.getWalletBalanceAsync();
             return wallet.totalAmount;
         } catch (error: any) {
-            this.handleError(error);
+            this.handleError(error, request.commonId);
         }
     }
 
     @Get('wallet-balance/available')
-    async getWalletAvailableBalance(): Promise<number> {
+    async getWalletAvailableBalance(@Req() request: Request): Promise<number> {
         try {
             const wallet = await this.bybitInvestingService.getWalletBalanceAsync();
             return wallet.availableAmount;
         } catch (error: any) {
-            this.handleError(error);
+            this.handleError(error, request.commonId);
         }
     }
 
     @Get('positions')
-    async getOpenPositions(): Promise<Position[]> {
+    async getOpenPositions(@Req() request: Request): Promise<Position[]> {
         try {
             const positions = await this.investingService.getPositionsAsync();
             return positions
         } catch (error: any) {
-            this.handleError(error);
+            this.handleError(error, request.commonId);
         }
     }
 
-    private handleError(error: any): never {
-        this.errorsService.addError(error.message, error);
+    private handleError(error: any, commonId: string): never {
+        this.errorsService.addError(error.message, error, commonId);
 
         if (error.message === ErrorCodes.TOO_MANY_REQUESTS) {
             throw new HttpException(error.message, HttpStatus.TOO_MANY_REQUESTS);
