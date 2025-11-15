@@ -16,19 +16,20 @@ class LogEntry {
 
 class SystemHeartbeat {
     private heartbeatUrl: string = process.env.HEARTBEAT_URL || '';
+    private lastTimestamp: number = Date.now();
 
     constructor(private readonly http: HttpService, private readonly applicationName: string, private readonly machineName: string) { }
 
-    async logError(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('error', commonId, message, payload);
+    async logError(ommonId: string, message: string, payload?: any): Promise<void> {
+        this.log('error', ommonId, message, payload);
     }
 
-    async logWarn(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('warning', commonId, message, payload);
+    async logWarn(ommonId: string, message: string, payload?: any): Promise<void> {
+        this.log('warning', ommonId, message, payload);
     }
 
-    async logInfo(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('info', commonId, message, payload);
+    async logInfo(ommonId: string, message: string, payload?: any): Promise<void> {
+        this.log('info', ommonId, message, payload);
     }
 
     private async log(level: Level, commonId: string, message: string, payload?: any): Promise<void> {
@@ -42,18 +43,20 @@ class SystemHeartbeat {
                 commonId,
                 applicationName: this.applicationName,
                 machineName: this.machineName,
-                timestamp: Date.now(),
+                timestamp: Date.now() === this.lastTimestamp ? Date.now() + 1 : Date.now(),
                 level: level,
                 message
             };
 
             logEntry.payload = payload ? JSON.stringify(payload) : undefined;
 
+            this.lastTimestamp = logEntry.timestamp;
+
             await firstValueFrom(
                 this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry)
             );
         } catch (error: any) {
-            throw new Error(`Ping failed: ${error.message}`);
+            throw new Error(`Logging failed: ${error.message}`);
         }
     }
 
@@ -72,7 +75,7 @@ class SystemHeartbeat {
 
             return logEntries
         } catch (error: any) {
-            throw new Error(`Ping failed: ${error.message}`);
+            throw new Error(`Retrieving logs failed: ${error.message}`);
         }
     }
 }
