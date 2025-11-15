@@ -32,7 +32,7 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
 
     private startRefreshingPositions() {
         this.intervalId = setInterval(async () => {
-            const positions = await this.bybitInvestingService.getPositionInfoAsync();
+            const positions = await this.bybitInvestingService.getPositionInfoAsync('interal');
 
             this.positionsSubject.next(positions);
         }, 3000);

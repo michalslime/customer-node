@@ -23,7 +23,7 @@ export class BybitInvestingLocalService {
             //     symbol: symbol,
             // });
         } catch (error) {
-            this.errorsService.addError('Error at setLeverageAsync', error);
+            this.errorsService.addError('Error at setLeverageAsync', error, '');
             throw error;
         }
     }
@@ -47,7 +47,7 @@ export class BybitInvestingLocalService {
 
             return wallet;
         } catch (error) {
-            this.errorsService.addError('Error at getWalletBalanceAsync', error);
+            this.errorsService.addError('Error at getWalletBalanceAsync', error, '');
             throw error;
         }
     }
@@ -64,6 +64,7 @@ export class BybitInvestingLocalService {
             // const positions = list.map((item) => PositionMapper(item));
 
             // return positions;
+
             const mockPosition = new Position();
             mockPosition.coin = 'BTC' as Coin;
             mockPosition.symbol = 'BTCUSDT';
@@ -77,7 +78,7 @@ export class BybitInvestingLocalService {
 
             return [mockPosition];
         } catch (error) {
-            this.errorsService.addError('Error at getPositionInfoAsync', error);
+            this.errorsService.addError('Error at getPositionInfoAsync', error, '');
             throw error;
         }
     }
@@ -92,7 +93,7 @@ export class BybitInvestingLocalService {
 
             await this.openPositionAsync(coin, side, qty);
         } catch (error) {
-            this.errorsService.addError('Error at newOrderAsync', error);
+            this.errorsService.addError('Error at newOrderAsync', error, '');
             throw error;
         }
     }
@@ -102,7 +103,7 @@ export class BybitInvestingLocalService {
             const symbol = `${coin}USDT`;
             await this.submitOrderWithPrecisionAsync(qty, 3, symbol, side);
         } catch (error) {
-            this.errorsService.addError('Error at openPositionAsync', error);
+            this.errorsService.addError('Error at openPositionAsync', error, '');
             throw error;
         }
     }
@@ -123,7 +124,7 @@ export class BybitInvestingLocalService {
             // return price;
             return 1;
         } catch (error) {
-            this.errorsService.addError('Error at getPriceAsync', error);
+            this.errorsService.addError('Error at getPriceAsync', error, '');
             throw error;
         }
     }
@@ -146,7 +147,7 @@ export class BybitInvestingLocalService {
 
             await this.openPositionAsync(coin, position.side === 'Buy' ? 'Sell' : 'Buy', quantity);
         } catch (error) {
-            this.errorsService.addError('Error at closePositionAsync', error);
+            this.errorsService.addError('Error at closePositionAsync', error, '');
             throw error;
         }
     }
@@ -163,7 +164,7 @@ export class BybitInvestingLocalService {
             //     positionIdx: 0,
             // });
         } catch (error) {
-            this.errorsService.addError('Error at setting stop loss', error);
+            this.errorsService.addError('Error at setting stop loss', error, '');
             throw error;
         }        
     }
@@ -192,7 +193,7 @@ export class BybitInvestingLocalService {
             //     throw new Error(response.retMsg);
             // 
         } catch (error) {
-            this.errorsService.addError(`Error at submitting order (Symbol: ${symbol}, Side: ${side}, Qty: ${formattedQty}):`, error);
+            this.errorsService.addError(`Error at submitting order (Symbol: ${symbol}, Side: ${side}, Qty: ${formattedQty}):`, error, '');
             throw error;
         }
     }

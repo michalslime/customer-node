@@ -22,7 +22,7 @@ export class BybitInvestingService {
         });
     }
 
-    public async setLeverageAsync(coin: Coin, leverage: Leverage): Promise<void> {
+    public async setLeverageAsync(commonId: string, coin: Coin, leverage: Leverage): Promise<void> {
         const symbol = `${coin}USDT`;
         try {
             await this.bybitRestClientV5.setLeverage({
@@ -32,12 +32,12 @@ export class BybitInvestingService {
                 symbol: symbol,
             });
         } catch (error) {
-            this.errorsService.addError('Error at setLeverageAsync', error);
+            this.errorsService.addError('Error at setLeverageAsync', error, commonId);
             throw error;
         }
     }
 
-    public async getWalletBalanceAsync(): Promise<WalletBalance> {
+    public async getWalletBalanceAsync(commonId: string): Promise<WalletBalance> {
         try {
             const response = await this.bybitRestClientV5.getWalletBalance({
                 accountType: 'UNIFIED',
@@ -55,12 +55,12 @@ export class BybitInvestingService {
 
             return wallet;
         } catch (error) {
-            this.errorsService.addError('Error at getWalletBalanceAsync', error);
+            this.errorsService.addError('Error at getWalletBalanceAsync', error, commonId);
             throw error;
         }
     }
 
-    public async getPositionInfoAsync(): Promise<Position[]> {
+    public async getPositionInfoAsync(commonId: string): Promise<Position[]> {
         try {
             const response = await this.bybitRestClientV5.getPositionInfo({
                 category: 'linear',
@@ -73,37 +73,37 @@ export class BybitInvestingService {
 
             return positions;
         } catch (error) {
-            this.errorsService.addError('Error at getPositionInfoAsync', error);
+            this.errorsService.addError('Error at getPositionInfoAsync', error, commonId);
             throw error;
         }
     }
 
-    public async newOrderAsync(coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void> {
+    public async newOrderAsync(commonId: string, coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void> {
         try {
-            const [wallet, price] = await Promise.all([this.getWalletBalanceAsync(), this.getPriceAsync(coin)]);
+            const [wallet, price] = await Promise.all([this.getWalletBalanceAsync(commonId), this.getPriceAsync(commonId, coin)]);
 
-            await this.setLeverageAsync(coin, leverage);
+            await this.setLeverageAsync(commonId, coin, leverage);
 
             const qty = (wallet.availableAmount * ((percentage * leverage) / 100)) / price;
 
-            await this.openPositionAsync(coin, side, qty);
+            await this.openPositionAsync(commonId, coin, side, qty);
         } catch (error) {
-            this.errorsService.addError('Error at newOrderAsync', error);
+            this.errorsService.addError('Error at newOrderAsync', error, commonId);
             throw error;
         }
     }
 
-    public async openPositionAsync(coin: Coin, side: Side, qty: number): Promise<void> {
+    public async openPositionAsync(commonId: string, coin: Coin, side: Side, qty: number): Promise<void> {
         try {
             const symbol = `${coin}USDT`;
-            await this.submitOrderWithPrecisionAsync(qty, 3, symbol, side);
+            await this.submitOrderWithPrecisionAsync(commonId, qty, 3, symbol, side);
         } catch (error) {
-            this.errorsService.addError('Error at openPositionAsync', error);
+            this.errorsService.addError('Error at openPositionAsync', error, commonId);
             throw error;
         }
     }
 
-    public async getPriceAsync(coin: Coin): Promise<number> {
+    public async getPriceAsync(commonId: string, coin: Coin): Promise<number> {
         try {
             const symbol = `${coin}USDT`;
             const response = await this.bybitRestClientV5.getTickers({
@@ -118,20 +118,20 @@ export class BybitInvestingService {
 
             return price;
         } catch (error) {
-            this.errorsService.addError('Error at getPriceAsync', error);
+            this.errorsService.addError('Error at getPriceAsync', error, commonId);
             throw error;
         }
     }
 
-    public closeWholePositionAsync(coin: Coin): Promise<void> {
-        return this.closePositionAsync(coin, undefined);
+    public closeWholePositionAsync(commonId: string, coin: Coin): Promise<void> {
+        return this.closePositionAsync(commonId, coin, undefined);
     }
 
-    public async closePositionAsync(coin: Coin, quantity?: number): Promise<void> {
+    public async closePositionAsync(commonId: string, coin: Coin, quantity?: number): Promise<void> {
         const symbol = coin + USDTCoin;
 
         try {
-            const position = (await this.getPositionInfoAsync()).find((x) => x.symbol === symbol);
+            const position = (await this.getPositionInfoAsync(commonId)).find((x) => x.symbol === symbol);
 
             if (position === undefined) {
                 return;
@@ -139,14 +139,14 @@ export class BybitInvestingService {
 
             quantity = quantity === undefined ? position.size : quantity;
 
-            await this.openPositionAsync(coin, position.side === 'Buy' ? 'Sell' : 'Buy', quantity);
+            await this.openPositionAsync(commonId, coin, position.side === 'Buy' ? 'Sell' : 'Buy', quantity);
         } catch (error) {
-            this.errorsService.addError('Error at closePositionAsync', error);
+            this.errorsService.addError('Error at closePositionAsync', error, commonId);
             throw error;
         }
     }
 
-    public async setStopLossAsync(coin: Coin, stopLossPrice: number) {
+    public async setStopLossAsync(commonId: string, coin: Coin, stopLossPrice: number) {
         const symbol = coin + USDTCoin;
 
         try {
@@ -158,12 +158,12 @@ export class BybitInvestingService {
                 positionIdx: 0,
             });
         } catch (error) {
-            this.errorsService.addError('Error at setting stop loss', error);
+            this.errorsService.addError('Error at setting stop loss', error, commonId);
             throw error;
         }        
     }
 
-    private async submitOrderWithPrecisionAsync(qty: number, precision: number, symbol: string, side: Side, retries = 3): Promise<void> {
+    private async submitOrderWithPrecisionAsync(commonId: string, qty: number, precision: number, symbol: string, side: Side, retries = 3): Promise<void> {
         console.log(qty);
         const formattedQty = qty.toFixed(precision).replace(/\.?0+$/, '');
 
@@ -180,14 +180,14 @@ export class BybitInvestingService {
                 if (retries <= 0) {
                     throw new Error(`Failed to submit order after multiple attempts: ${response.retMsg}`);
                 }
-                return this.submitOrderWithPrecisionAsync(qty, precision - 1, symbol, side, retries - 1);
+                return this.submitOrderWithPrecisionAsync(commonId, qty, precision - 1, symbol, side, retries - 1);
             }
 
             if (response.retCode !== 0 || response.retMsg !== 'OK') {
                 throw new Error(response.retMsg);
             }
         } catch (error) {
-            this.errorsService.addError(`Error at submitting order (Symbol: ${symbol}, Side: ${side}, Qty: ${formattedQty}):`, error);
+            this.errorsService.addError(`Error at submitting order (Symbol: ${symbol}, Side: ${side}, Qty: ${formattedQty}):`, error, commonId);
             throw error;
         }
     }

@@ -47,17 +47,17 @@ export class CommandsService {
             
             switch (command.type) {
                 case 'SET_STOP_LOSS':
-                    await this.bybitInvestingService.setStopLossAsync(command.coin, command.payload);
+                    await this.bybitInvestingService.setStopLossAsync(commonId, command.coin, command.payload);
                     break;
                 case 'CLOSE_POSITION':
-                    await this.bybitInvestingService.closeWholePositionAsync(command.coin);
+                    await this.bybitInvestingService.closeWholePositionAsync(commonId, command.coin);
                     break;
                 case 'OPEN_POSITION':
-                    await this.bybitInvestingService.newOrderAsync(command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
-                    const price = await this.bybitInvestingService.getPriceAsync(command.coin);
+                    await this.bybitInvestingService.newOrderAsync(commonId, command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
+                    const price = await this.bybitInvestingService.getPriceAsync(commonId, command.coin);
 
                     const stopLoss = command.payload.side === 'Buy' ? price * 0.96 : price * 1.04;
-                    await this.bybitInvestingService.setStopLossAsync(command.coin, stopLoss);
+                    await this.bybitInvestingService.setStopLossAsync(commonId, command.coin, stopLoss);
                     break;
                 default:
                     systemHeartbeat.logWarn(commonId, `Unknown command type: ${command.type}`, command);

@@ -33,7 +33,7 @@ export class AppController {
     async getPrice(@Req() request: Request, @Param('coin') coin: Coin): Promise<number> {
         console.log(coin);
         try {
-            const price = await this.bybitInvestingService.getPriceAsync(coin);
+            const price = await this.bybitInvestingService.getPriceAsync(request.commonId, coin);
             return price || 0;
         } catch (error: any) {
             this.handleError(error, request.commonId);
@@ -43,7 +43,7 @@ export class AppController {
     @Get('wallet-balance/total')
     async getWalletTotalBalance(@Req() request: Request): Promise<number> {
         try {
-            const wallet = await this.bybitInvestingService.getWalletBalanceAsync();
+            const wallet = await this.bybitInvestingService.getWalletBalanceAsync(request.commonId);
             return wallet.totalAmount;
         } catch (error: any) {
             this.handleError(error, request.commonId);
@@ -53,7 +53,7 @@ export class AppController {
     @Get('wallet-balance/available')
     async getWalletAvailableBalance(@Req() request: Request): Promise<number> {
         try {
-            const wallet = await this.bybitInvestingService.getWalletBalanceAsync();
+            const wallet = await this.bybitInvestingService.getWalletBalanceAsync(request.commonId);
             return wallet.availableAmount;
         } catch (error: any) {
             this.handleError(error, request.commonId);
