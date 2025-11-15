@@ -14,7 +14,7 @@ class LogEntry {
     payload?: any;
 }
 
-class SystemHeartbeat {
+export class SystemHeartbeat {
     private heartbeatUrl: string = process.env.HEARTBEAT_URL || '';
     private lastTimestamp: number = Date.now();
 
@@ -56,7 +56,7 @@ class SystemHeartbeat {
                 this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry)
             );
         } catch (error: any) {
-            throw new Error(`Logging failed: ${error.message}`);
+            console.error(`Logging failed: ${error.message}`);
         }
     }
 
@@ -75,7 +75,8 @@ class SystemHeartbeat {
 
             return logEntries
         } catch (error: any) {
-            throw new Error(`Retrieving logs failed: ${error.message}`);
+            console.error(`Retrieving logs failed: ${error.message}`);
+            return [];
         }
     }
 }
@@ -88,18 +89,3 @@ export function getHeaderWithCommonId(commonId: string, header?: any): any {
     }
   };
 }
-
-const myPublicUrl = process.env.MY_PUBLIC_URL || '';
-let machineName = 'unknown-machine';
-
-if (myPublicUrl) {
-    machineName = hashTo6Upper(myPublicUrl);
-}
-
-let applicationName = 'customer-node';
-
-if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
-    applicationName += `-${process.env.NODE_ENV}`;
-}
-
-export const systemHeartbeat = new SystemHeartbeat(new HttpService(), applicationName, machineName);
