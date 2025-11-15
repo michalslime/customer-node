@@ -5,7 +5,7 @@ import { Command } from "src/models/command";
 import { InvestingService } from "./investing.service";
 import { BybitInvestingService } from "./bybit-investing.service";
 import { ErrorCodes } from "src/others/error-codes.enum";
-import { systemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
+import { getHeaderWithCommonId, systemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
 @Injectable()
 export class CommandsService {
@@ -24,7 +24,7 @@ export class CommandsService {
             const url = `${this.apiUrl}/investing/customer-commands/${this.lastFullfieldCommandTimestamp}`;
             console.log(`Fetching commands from URL: ${url}`);
             const response = await firstValueFrom(
-                this.http.get<Command<any>[]>(url)
+                this.http.get<Command<any>[]>(url, getHeaderWithCommonId(commonId))
             );
 
             const commands = response.data;
