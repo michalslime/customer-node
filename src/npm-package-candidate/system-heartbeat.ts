@@ -1,6 +1,5 @@
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
-import { hashTo6Upper } from "./utils";
 
 type Level = 'info' | 'warning' | 'error';
 
