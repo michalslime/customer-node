@@ -5,7 +5,7 @@ import { Command } from "src/models/command";
 import { InvestingService } from "./investing.service";
 import { BybitInvestingService } from "./bybit-investing.service";
 import { ErrorCodes } from "src/others/error-codes.enum";
-import { getHeaderWithCommonId, systemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
+import { getHeaderWithCommonId, SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
 @Injectable()
 export class CommandsService {
@@ -14,12 +14,13 @@ export class CommandsService {
 
     constructor(private readonly http: HttpService,
         private readonly investingService: InvestingService,
-        private readonly bybitInvestingService: BybitInvestingService
+        private readonly bybitInvestingService: BybitInvestingService,
+        private readonly systemHeartbeat: SystemHeartbeat
     ) { }
 
     public async getCommandsAsync(commonId: string): Promise<Command<any>[]> {
         try {
-            systemHeartbeat.logInfo(commonId, 'Fetching commands from Octopus', { lastTimestamp: this.lastFullfieldCommandTimestamp });
+            this.systemHeartbeat.logInfo(commonId, 'Fetching commands from Octopus', { lastTimestamp: this.lastFullfieldCommandTimestamp });
             
             const url = `${this.apiUrl}/investing/customer-commands/${this.lastFullfieldCommandTimestamp}`;
             console.log(`Fetching commands from URL: ${url}`);
@@ -30,7 +31,7 @@ export class CommandsService {
             const commands = response.data;
             const sortedCommands =  commands.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            systemHeartbeat.logInfo(commonId, `Fetched ${sortedCommands.length} commands from Octopus`, sortedCommands);
+            this.systemHeartbeat.logInfo(commonId, `Fetched ${sortedCommands.length} commands from Octopus`, sortedCommands);
 
             return sortedCommands;
         } catch (error: any) {
@@ -40,7 +41,7 @@ export class CommandsService {
 
     public async processFetchedCommandsAsync(commands: Command<any>[], commonId: string): Promise<void> {
         for (const command of commands) {
-            systemHeartbeat.logInfo(commonId, `Processing command: ${command.type} for coin: ${command.coin}`, command);
+            this.systemHeartbeat.logInfo(commonId, `Processing command: ${command.type} for coin: ${command.coin}`, command);
 
             this.lastFullfieldCommandTimestamp = command.createdTimestamp ?? Date.now();
             this.lastFullfieldCommandTimestamp += 1;
@@ -60,7 +61,7 @@ export class CommandsService {
                     await this.bybitInvestingService.setStopLossAsync(commonId, command.coin, stopLoss);
                     break;
                 default:
-                    systemHeartbeat.logWarn(commonId, `Unknown command type: ${command.type}`, command);
+                    this.systemHeartbeat.logWarn(commonId, `Unknown command type: ${command.type}`, command);
             }
         }
     }
