@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { ReplaySubject } from "rxjs";
 import { ErrorModel } from "src/models/error-model";
-import { systemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
+import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
 @Injectable()
 export class ErrorsService {
 
     private errorsSubject = new ReplaySubject<ErrorModel>(100);
+
+    constructor(private readonly systemHeartbeat: SystemHeartbeat) {}
 
     public get errors$() {
         return this.errorsSubject.asObservable();
@@ -15,7 +17,7 @@ export class ErrorsService {
     public addError(message: string, err: any, commonId: string): void {
         console.error(message);
 
-        systemHeartbeat.logError(commonId, message, err);
+        this.systemHeartbeat.logError(commonId, message, err);
         
         this.errorsSubject.next({
             message,
