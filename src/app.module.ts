@@ -8,6 +8,16 @@ import { CommandsService } from './services/commands.service';
 import { HttpModule } from '@nestjs/axios';
 import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
 import { FillCommonIdMiddleware } from './npm-package-candidate/fill-common-id.middleware';
+import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
+import { hashTo6Upper } from './npm-package-candidate/utils';
+
+const myPublicUrl = process.env.MY_PUBLIC_URL || '';
+const machineName = myPublicUrl ? hashTo6Upper(myPublicUrl) : 'unknown-machine';
+
+let applicationName = 'customer-node';
+if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
+    applicationName += `-${process.env.NODE_ENV}`;
+}
 
 @Module({
     imports: [
@@ -17,6 +27,10 @@ import { FillCommonIdMiddleware } from './npm-package-candidate/fill-common-id.m
         }),
         HttpModule.register({
             timeout: 10000,
+        }),
+        HeartbeatModule.forRoot({
+            applicationName,
+            machineName,
         }),
     ],
     controllers: [AppController],
