@@ -1,10 +1,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import { systemHeartbeat } from './system-heartbeat';
+import { SystemHeartbeat } from './system-heartbeat';
 
 @Injectable()
 export class FillCommonIdMiddleware implements NestMiddleware {
+    constructor(private readonly systemHeartbeat: SystemHeartbeat) {}
+
     use(req: Request & { commonId: string }, res: Response, next: NextFunction) {
         const xCommonId = req.headers['x-common-id'];
 
@@ -14,7 +16,7 @@ export class FillCommonIdMiddleware implements NestMiddleware {
             req.commonId = xCommonId.toString();
         }
 
-        systemHeartbeat.logInfo(req.commonId, `Request received: ${req.method} ${req.originalUrl}`);
+        this.systemHeartbeat.logInfo(req.commonId, `Request received: ${req.method} ${req.originalUrl}`);
 
         next();
     }
