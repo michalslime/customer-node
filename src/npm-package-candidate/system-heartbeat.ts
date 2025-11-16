@@ -56,6 +56,7 @@ export class SystemHeartbeat {
             );
         } catch (error: any) {
             console.error(`Logging failed: ${error.message}`);
+            console.error(`Original log: ${level} - ${commonId} - ${message}`);
         }
     }
 
