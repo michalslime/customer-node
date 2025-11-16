@@ -52,7 +52,7 @@ export class SystemHeartbeat {
             this.lastTimestamp = logEntry.timestamp;
 
             await firstValueFrom(
-                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry)
+                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, getHeaderWithHeartbeatPassword())
             );
         } catch (error: any) {
             console.error(`Logging failed: ${error.message}`);
@@ -82,10 +82,21 @@ export class SystemHeartbeat {
 }
 
 export function getHeaderWithCommonId(commonId: string, header?: any): any {
+  const heartbeatHeaders = getHeaderWithHeartbeatPassword(header);
+  
+  return {
+    headers: {
+      ...heartbeatHeaders.headers,
+      'x-common-id': commonId,
+    }
+  };
+}
+
+function getHeaderWithHeartbeatPassword(header?: any): any {
   return {
     headers: {
       ...(header ?? {}),
-      'x-common-id': commonId,
+      'x-password': process.env.HEARTBEAT_PASSWORD || '',
     }
   };
 }

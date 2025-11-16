@@ -23,7 +23,7 @@ export class CommandsService {
             this.systemHeartbeat.logInfo(commonId, 'Fetching commands from Octopus', { lastTimestamp: this.lastFullfieldCommandTimestamp });
             
             const url = `${this.apiUrl}/investing/customer-commands/${this.lastFullfieldCommandTimestamp}`;
-            console.log(`Fetching commands from URL: ${url}`);
+
             const response = await firstValueFrom(
                 this.http.get<Command<any>[]>(url, getHeaderWithCommonId(commonId))
             );

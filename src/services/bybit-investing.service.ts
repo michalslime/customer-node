@@ -164,7 +164,6 @@ export class BybitInvestingService {
     }
 
     private async submitOrderWithPrecisionAsync(commonId: string, qty: number, precision: number, symbol: string, side: Side, retries = 3): Promise<void> {
-        console.log(qty);
         const formattedQty = qty.toFixed(precision).replace(/\.?0+$/, '');
 
         try {
