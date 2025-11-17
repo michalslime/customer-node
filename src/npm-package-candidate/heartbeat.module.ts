@@ -2,10 +2,11 @@ import { MiddlewareConsumer, Module, NestModule, DynamicModule } from '@nestjs/c
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { SystemHeartbeat } from './system-heartbeat';
 import { FillCommonIdMiddleware } from './fill-common-id.middleware';
+import { hashTo6Upper } from './utils';
 
 export interface HeartbeatModuleOptions {
     applicationName: string;
-    machineName: string;
+    machineUrl: string;
 }
 
 @Module({})
@@ -14,6 +15,7 @@ export class HeartbeatModule implements NestModule {
         return {
             module: HeartbeatModule,
             imports: [HttpModule],
+            global: true,
             providers: [
                 {
                     provide: 'HEARTBEAT_OPTIONS',
@@ -22,8 +24,12 @@ export class HeartbeatModule implements NestModule {
                 {
                     provide: SystemHeartbeat,
                     inject: [HttpService, 'HEARTBEAT_OPTIONS'],
-                    useFactory: (http: HttpService, opts: HeartbeatModuleOptions) =>
-                        new SystemHeartbeat(http, opts.applicationName, opts.machineName),
+                    useFactory: (http: HttpService, opts: HeartbeatModuleOptions) => {
+                        const machineName = opts.machineUrl ? hashTo6Upper(opts.machineUrl) : 'unknown-machine';
+                        const applicationName = `${opts.applicationName}${process.env.NODE_ENV === 'development' ? '' : '-' + process.env.NODE_ENV}`;
+
+                        return new SystemHeartbeat(http, applicationName, machineName);
+                    }
                 },
             ],
             exports: [SystemHeartbeat],

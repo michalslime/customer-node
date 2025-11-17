@@ -11,14 +11,6 @@ import { FillCommonIdMiddleware } from './npm-package-candidate/fill-common-id.m
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { hashTo6Upper } from './npm-package-candidate/utils';
 
-const myPublicUrl = process.env.MY_PUBLIC_URL || '';
-const machineName = myPublicUrl ? hashTo6Upper(myPublicUrl) : 'unknown-machine';
-
-let applicationName = 'customer-node';
-if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
-    applicationName += `-${process.env.NODE_ENV}`;
-}
-
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -29,8 +21,8 @@ if (process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
             timeout: 10000,
         }),
         HeartbeatModule.forRoot({
-            applicationName,
-            machineName,
+            applicationName: 'customer-node',
+            machineUrl: process.env.MY_PUBLIC_URL || ''
         }),
     ],
     controllers: [AppController],
