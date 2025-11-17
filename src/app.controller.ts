@@ -4,7 +4,7 @@ import { BybitInvestingService } from './services/bybit-investing.service';
 import { ErrorsService } from './services/errors.service';
 import { InvestingService } from './services/investing.service';
 import { ErrorCodes } from './others/error-codes.enum';
-import { CommandsService } from './services/commands.service';
+import { CommandsService } from './npm-package-candidate/commands.service';
 import { Position } from './models/position';
 import type { Request } from 'express';
 
@@ -19,9 +19,7 @@ export class AppController {
     @Post('ping')
     async handlePing(@Req() request: Request): Promise<void> {
         try {
-            const commands = await this.commandsService.getCommandsAsync(request.commonId);
-
-            await this.commandsService.processFetchedCommandsAsync(commands, request.commonId);
+            await this.investingService.fetchAndProcessCommand(request.commonId, this.commandsService);
 
             return;
         } catch (error: any) {

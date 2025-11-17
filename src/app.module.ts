@@ -1,15 +1,14 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ErrorsService } from './services/errors.service';
 import { BybitInvestingService } from './services/bybit-investing.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InvestingService } from './services/investing.service';
-import { CommandsService } from './services/commands.service';
-import { HttpModule } from '@nestjs/axios';
+import { CommandsService } from './npm-package-candidate/commands.service';
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
-import { FillCommonIdMiddleware } from './npm-package-candidate/fill-common-id.middleware';
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
-import { hashTo6Upper } from './npm-package-candidate/utils';
+import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 
 @Module({
     imports: [
@@ -43,7 +42,17 @@ import { hashTo6Upper } from './npm-package-candidate/utils';
             inject: [ConfigService, ErrorsService]
         },
         InvestingService,
-        CommandsService
+        {
+            provide: CommandsService,
+            useFactory: (configService: ConfigService, httpService: HttpService, systemHeartbeat: SystemHeartbeat) => {
+  
+                let octopusUrl = configService.get<string>('OCTOPUS_URL') ?? '';
+
+                return new CommandsService('Octopus', octopusUrl, httpService, systemHeartbeat);
+            },
+            inject: [ConfigService, HttpService, SystemHeartbeat]
+        },
+        
     ],
 })
 export class AppModule { 
