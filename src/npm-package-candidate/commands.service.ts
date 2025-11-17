@@ -17,7 +17,7 @@ export class CommandsService {
 
     public async getCommandsAsync(commonId: string): Promise<Command<any>[]> {
         try {
-            const url = `${this.sourceUrl}/investing/customer-commands/${this.lastFullfieldCommandTimestamp}`;
+            const url = `${this.sourceUrl}/${this.lastFullfieldCommandTimestamp}`;
 
             this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url: url });
 

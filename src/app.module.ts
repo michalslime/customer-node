@@ -48,7 +48,7 @@ import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
   
                 let octopusUrl = configService.get<string>('OCTOPUS_URL') ?? '';
 
-                return new CommandsService('Octopus', octopusUrl, httpService, systemHeartbeat);
+                return new CommandsService('Octopus', `${octopusUrl}/investing/customer-commands`, httpService, systemHeartbeat);
             },
             inject: [ConfigService, HttpService, SystemHeartbeat]
         },
