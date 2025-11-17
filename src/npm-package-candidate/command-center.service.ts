@@ -1,5 +1,5 @@
 import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
-import { Command } from "../models/command";
+import { Command } from "./command";
 import { Injectable, Scope } from "@nestjs/common";
 
 @Injectable({scope: Scope.TRANSIENT})

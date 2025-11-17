@@ -1,7 +1,7 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import { firstValueFrom } from "rxjs";
-import { Command } from "src/models/command";
+import { Command } from "src/npm-package-candidate/command";
 import { getHeaderWithCommonId, SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
 @Injectable()
