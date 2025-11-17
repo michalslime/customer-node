@@ -3,13 +3,25 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { SystemHeartbeat } from './system-heartbeat';
 import { FillCommonIdMiddleware } from './fill-common-id.middleware';
 import { hashTo6Upper } from './utils';
+import { CommandCenterService } from './command-center.service';
+import { ModuleRef } from '@nestjs/core';
 
 export interface HeartbeatModuleOptions {
     applicationName: string;
     machineUrl: string;
 }
 
-@Module({})
+@Module({
+    providers: [
+        CommandCenterService,
+        {
+            provide: 'COMMAND_CENTER_FACTORY',
+            useFactory: (moduleRef: ModuleRef) => async () => moduleRef.resolve(CommandCenterService),
+            inject: [ModuleRef],
+        },
+    ],
+    exports: [CommandCenterService, 'COMMAND_CENTER_FACTORY'],
+})
 export class HeartbeatModule implements NestModule {
     static forRoot(options: HeartbeatModuleOptions): DynamicModule {
         return {
