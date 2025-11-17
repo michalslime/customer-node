@@ -19,7 +19,7 @@ export class AppController {
     @Post('ping')
     async handlePing(@Req() request: Request): Promise<void> {
         try {
-            await this.investingService.fetchAndProcessCommand(request.commonId, this.commandsService);
+            await this.investingService.fetchAndProcessCommands(request.commonId, this.commandsService);
 
             return;
         } catch (error: any) {

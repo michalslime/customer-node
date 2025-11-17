@@ -32,7 +32,7 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
         return positions;
     }
 
-    public async fetchAndProcessCommand(commonId: string, commandsService: CommandsService): Promise<void> {
+    public async fetchAndProcessCommands(commonId: string, commandsService: CommandsService): Promise<void> {
         const commands = await commandsService.getCommandsAsync(commonId);
 
         for (const command of commands) {
