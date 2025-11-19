@@ -17,18 +17,18 @@ export class SystemHeartbeat {
     private heartbeatUrl: string = process.env.HEARTBEAT_URL || '';
     private lastTimestamp: number = Date.now();
 
-    constructor(private readonly http: HttpService, private readonly applicationName: string, private readonly machineName: string) { }
+    constructor(private readonly http: HttpService, public readonly applicationName: string, public readonly machineName: string) { }
 
-    async logError(ommonId: string, message: string, payload?: any): Promise<void> {
-        this.log('error', ommonId, message, payload);
+    async logError(commonId: string, message: string, payload?: any): Promise<void> {
+        this.log('error', commonId, message, payload);
     }
 
-    async logWarn(ommonId: string, message: string, payload?: any): Promise<void> {
-        this.log('warning', ommonId, message, payload);
+    async logWarn(commonId: string, message: string, payload?: any): Promise<void> {
+        this.log('warning', commonId, message, payload);
     }
 
-    async logInfo(ommonId: string, message: string, payload?: any): Promise<void> {
-        this.log('info', ommonId, message, payload);
+    async logInfo(commonId: string, message: string, payload?: any): Promise<void> {
+        this.log('info', commonId, message, payload);
     }
 
     private async log(level: Level, commonId: string, message: string, payload?: any): Promise<void> {
@@ -52,7 +52,7 @@ export class SystemHeartbeat {
             this.lastTimestamp = logEntry.timestamp;
 
             await firstValueFrom(
-                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, getHeaderWithHeartbeatPassword())
+                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, headers().withHeartbeatPassword().build())
             );
         } catch (error: any) {
             console.error(`Logging failed: ${error.message}`);
@@ -81,22 +81,46 @@ export class SystemHeartbeat {
     }
 }
 
-export function getHeaderWithCommonId(commonId: string, header?: any): any {
-  const heartbeatHeaders = getHeaderWithHeartbeatPassword(header);
-  
-  return {
-    headers: {
-      ...heartbeatHeaders.headers,
-      'x-common-id': commonId,
-    }
-  };
-}
+export function headers(initial?: Record<string, any>) {
+  let _headers = { ...(initial ?? {}) };
 
-function getHeaderWithHeartbeatPassword(header?: any): any {
-  return {
-    headers: {
-      ...(header ?? {}),
-      'x-password': process.env.HEARTBEAT_PASSWORD || '',
+  const api = {
+    withHeartbeatPassword() {
+      _headers = {
+        ..._headers,
+        'x-password': process.env.HEARTBEAT_PASSWORD || '',
+      };
+      return api;
+    },
+
+    withCommonId(commonId: string) {
+      _headers = {
+        ..._headers,
+        'x-common-id': commonId,
+      };
+      return api;
+    },
+
+    withMachineId(machineId: string) {
+      _headers = {
+        ..._headers,
+        'x-machine-id': machineId,
+      };
+      return api;
+    },
+
+    withRequestUrl() {
+      _headers = {
+        ..._headers,
+        'x-request-origin-url': process.env.MY_PUBLIC_URL || '',
+      };
+      return api;
+    },
+
+    build() {
+      return { headers: _headers };
     }
   };
+
+  return api;
 }

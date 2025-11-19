@@ -1,10 +1,8 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable } from "@nestjs/common";
 import { firstValueFrom } from "rxjs";
 import { Command } from "src/npm-package-candidate/command";
-import { getHeaderWithCommonId, SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
+import { headers, SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
-@Injectable()
 export class CommandsService {
     public lastFullfieldCommandTimestamp: number = Date.now();
 
@@ -22,7 +20,7 @@ export class CommandsService {
             this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url: url });
 
             const response = await firstValueFrom(
-                this.http.get<Command<any>[]>(url, getHeaderWithCommonId(commonId))
+                this.http.get<Command<any>[]>(url, headers().withCommonId(commonId).withMachineId(this.systemHeartbeat.machineName).build())
             );
 
             const commands = response.data;

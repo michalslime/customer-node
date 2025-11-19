@@ -16,7 +16,7 @@ export class FillCommonIdMiddleware implements NestMiddleware {
             req.commonId = xCommonId.toString();
         }
 
-        this.systemHeartbeat.logInfo(req.commonId, `Request received: ${req.method} ${req.originalUrl}`);
+        this.systemHeartbeat.logInfo(req.commonId, `Request received: ${req.method} ${req.originalUrl}`, req.method === 'POST' ? req.body : null);
 
         next();
     }

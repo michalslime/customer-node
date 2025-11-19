@@ -4,6 +4,7 @@ import { SystemHeartbeat } from './system-heartbeat';
 import { FillCommonIdMiddleware } from './fill-common-id.middleware';
 import { hashTo6Upper } from './utils';
 import { ModuleRef } from '@nestjs/core';
+import { FillMachineIdMiddleware } from './fill-machine-id.middleware';
 
 export interface HeartbeatModuleOptions {
     applicationName: string;
@@ -56,5 +57,6 @@ export class HeartbeatModule implements NestModule {
 
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(FillCommonIdMiddleware).forRoutes('*');
+        consumer.apply(FillMachineIdMiddleware).forRoutes('*');
     }
 }
