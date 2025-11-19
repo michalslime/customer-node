@@ -9,6 +9,7 @@ import { FillMachineIdMiddleware } from './fill-machine-id.middleware';
 export interface HeartbeatModuleOptions {
     applicationName: string;
     machineUrl: string;
+    workspace: string;
 }
 
 @Module({
@@ -44,10 +45,10 @@ export class HeartbeatModule implements NestModule {
                     provide: SystemHeartbeat,
                     inject: [HttpService, 'HEARTBEAT_OPTIONS'],
                     useFactory: (http: HttpService, opts: HeartbeatModuleOptions) => {
-                        const machineName = opts.machineUrl ? hashTo6Upper(opts.machineUrl) : 'unknown-machine';
+                        const machineId = opts.machineUrl ? hashTo6Upper(opts.machineUrl) : 'unknown-machine';
                         const applicationName = `${opts.applicationName}${process.env.NODE_ENV === 'development' ? '' : '-' + process.env.NODE_ENV}`;
 
-                        return new SystemHeartbeat(http, applicationName, machineName);
+                        return new SystemHeartbeat(http, applicationName, machineId, opts.machineUrl, opts.workspace);
                     }
                 },
             ],

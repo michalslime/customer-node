@@ -21,7 +21,8 @@ import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
         }),
         HeartbeatModule.forRoot({
             applicationName: 'customer-node',
-            machineUrl: process.env.MY_PUBLIC_URL || ''
+            machineUrl: process.env.MY_PUBLIC_URL || '',
+            workspace: process.env.WORKSPACE || 'NO_WORKSPACE'
         }),
     ],
     controllers: [AppController],

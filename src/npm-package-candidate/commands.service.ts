@@ -20,7 +20,7 @@ export class CommandsService {
             this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url: url });
 
             const response = await firstValueFrom(
-                this.http.get<Command<any>[]>(url, headers().withCommonId(commonId).withMachineId(this.systemHeartbeat.machineName).build())
+                this.http.get<Command<any>[]>(url, headers().withCommonId(commonId).withMachineId(this.systemHeartbeat.machineId).build())
             );
 
             const commands = response.data;
