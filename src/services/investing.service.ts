@@ -4,6 +4,8 @@ import { Position } from 'src/models/position';
 import { CommandsService } from 'src/npm-package-candidate/commands.service';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { BybitInvestingService } from 'src/services/bybit-investing.service';
+import { OctopusService } from './octopus.service';
+import { randomUUID } from 'crypto';
 
 
 @Injectable()
@@ -15,10 +17,12 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
         return this.positionsSubject.asObservable();
     }
 
-    constructor(private bybitInvestingService: BybitInvestingService, private systemHeartbeat: SystemHeartbeat) {}
+    constructor(private bybitInvestingService: BybitInvestingService, private systemHeartbeat: SystemHeartbeat, private octopusService: OctopusService) {}
 
     onModuleInit() {
         this.startRefreshingPositions();
+
+        this.octopusService.registerMe(randomUUID().toString())
     }
 
     onModuleDestroy() {

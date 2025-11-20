@@ -9,6 +9,7 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
+import { OctopusService } from './services/octopus.service';
 
 @Module({
     imports: [
@@ -53,6 +54,7 @@ import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
             },
             inject: [ConfigService, HttpService, SystemHeartbeat]
         },
+        OctopusService
         
     ],
 })

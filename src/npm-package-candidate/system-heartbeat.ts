@@ -15,6 +15,7 @@ class LogEntry {
 }
 
 let myPublicUrl: string = 'not-set-yet';
+let applicationStartTimestamp: number = Date.now();
 
 export class SystemHeartbeat {
     private heartbeatUrl: string = process.env.HEARTBEAT_URL || '';
@@ -58,7 +59,7 @@ export class SystemHeartbeat {
             this.lastTimestamp = logEntry.timestamp;
 
             await firstValueFrom(
-                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, headers().withHeartbeatPassword().withMyPublicUrl().build())
+                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, headers().withHeartbeatPassword().withMyPublicUrl().withAppStartTimestamp().build())
             );
         } catch (error: any) {
             console.error(`Logging failed: ${error.message}`);
@@ -119,6 +120,14 @@ export function headers(initial?: Record<string, any>) {
             _headers = {
                 ..._headers,
                 'x-request-origin-url': myPublicUrl,
+            };
+            return api;
+        },
+
+        withAppStartTimestamp() {
+            _headers = {
+                ..._headers,
+                'x-app-start-timestamp': applicationStartTimestamp,
             };
             return api;
         },
