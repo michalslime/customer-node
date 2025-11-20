@@ -23,7 +23,7 @@ export class OctopusService {
             }
 
             await firstValueFrom(
-                this.http.post(`${this.apiUrl}/customers/register`, body, headers().withCommonId(commonId).withHeartbeatPassword().build())
+                this.http.post(`${this.apiUrl}/customer/register`, body, headers().withCommonId(commonId).withHeartbeatPassword().build())
             );
 
             return true;
