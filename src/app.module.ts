@@ -50,7 +50,7 @@ import { OctopusService } from './services/octopus.service';
   
                 let octopusUrl = configService.get<string>('OCTOPUS_URL') ?? '';
 
-                return new CommandsService('Octopus', `${octopusUrl}/investing/customer-commands`, httpService, systemHeartbeat);
+                return new CommandsService('Octopus', `${octopusUrl}/customer/customer-commands`, httpService, systemHeartbeat);
             },
             inject: [ConfigService, HttpService, SystemHeartbeat]
         },
