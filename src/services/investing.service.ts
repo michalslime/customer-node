@@ -22,7 +22,8 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
     onModuleInit() {
         this.startRefreshingPositions();
 
-        this.octopusService.registerMe(randomUUID().toString())
+        const commonId = randomUUID().toString();
+        this.octopusService.registerMe(commonId).catch((error) => this.systemHeartbeat.logError(commonId, 'Registering failed', error))
     }
 
     onModuleDestroy() {
