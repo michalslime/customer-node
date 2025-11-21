@@ -31,7 +31,7 @@ import { OctopusService } from './services/octopus.service';
         ErrorsService,
         {
             provide: BybitInvestingService,
-            useFactory: (configService: ConfigService, errorsService: ErrorsService) => {
+            useFactory: (configService: ConfigService, errorsService: ErrorsService, systemHeartbeat: SystemHeartbeat) => {
                 if (process.env.NODE_ENV === 'development') {
                     return new BybitInvestingLocalService(errorsService);
                 }
@@ -39,7 +39,7 @@ import { OctopusService } from './services/octopus.service';
                 let apiKey = configService.get<string>('BYBIT_INVESTING_API_KEY') ?? '';
                 let secret = configService.get<string>('BYBIT_INVESTING_API_SECRET') ?? '';
 
-                return new BybitInvestingService(apiKey, secret, errorsService);
+                return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
             },
             inject: [ConfigService, ErrorsService]
         },
