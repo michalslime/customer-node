@@ -4,6 +4,7 @@ import { Coin, Leverage, Percentage, Side, USDTCoin } from 'src/models/bybit-inv
 import { Position, PositionMapper } from 'src/models/position';
 import { WalletBalance } from 'src/models/wallet';
 import { ErrorsService } from './errors.service';
+import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 
 @Injectable()
 export class BybitInvestingService {
@@ -13,7 +14,8 @@ export class BybitInvestingService {
     constructor(
         private readonly apiKey: string,
         private readonly secret: string,
-        private errorsService: ErrorsService
+        private errorsService: ErrorsService,
+        private systemHeartbeat: SystemHeartbeat
     ) {
         this.url = 'https://api.bybit.com';
         this.bybitRestClientV5 = new RestClientV5({
@@ -81,6 +83,11 @@ export class BybitInvestingService {
     public async newOrderAsync(commonId: string, coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void> {
         try {
             const [wallet, price] = await Promise.all([this.getWalletBalanceAsync(commonId), this.getPriceAsync(commonId, coin)]);
+
+            this.systemHeartbeat.logInfo(commonId, 'Wallet balance and price retrieved', {
+                wallet,
+                price
+            });
 
             await this.setLeverageAsync(commonId, coin, leverage);
 
