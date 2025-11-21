@@ -41,7 +41,7 @@ import { OctopusService } from './services/octopus.service';
 
                 return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
             },
-            inject: [ConfigService, ErrorsService]
+            inject: [ConfigService, ErrorsService, SystemHeartbeat]
         },
         InvestingService,
         {
