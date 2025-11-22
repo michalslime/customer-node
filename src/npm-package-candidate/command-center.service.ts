@@ -1,8 +1,6 @@
 import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 import { Command } from "./command";
-import { Injectable, Scope } from "@nestjs/common";
 
-@Injectable({scope: Scope.TRANSIENT})
 export class CommandCenterService {
     private commandQueue: Command<any>[] = [];
 

@@ -26,8 +26,8 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
     private lastTimestamp: number = Date.now();
     private intervalId: NodeJS.Timeout | null = null;
 
-    constructor(private readonly http: HttpService, public readonly applicationName: string, public readonly machineId: string, myPublicUrl: string, public readonly workspace: string) {
-        const trimmed = trimTrailingSlash(myPublicUrl);
+    constructor(private readonly http: HttpService, public readonly applicationName: string, public readonly machineId: string, _myPublicUrl: string, public readonly workspace: string) {
+        const trimmed = trimTrailingSlash(_myPublicUrl);
         myPublicUrl = trimmed;
         this.myPublicUrl = trimmed;
     }
