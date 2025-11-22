@@ -5,5 +5,6 @@ declare module 'express' {
     role: Role | null;
     commonId: string;
     machineId: string | null;
+    machineName: string | null;
   }
 }

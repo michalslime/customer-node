@@ -13,3 +13,7 @@ export function hashTo6Upper(input: string): string {
 
   return out.reverse().join("");
 }
+
+export function trimTrailingSlash(url: string): string {
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+}

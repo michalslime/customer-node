@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { headers, SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
+import { trimTrailingSlash } from 'src/npm-package-candidate/utils';
 
 @Injectable()
 export class OctopusService {
-    private readonly apiUrl: string = process.env.OCTOPUS_URL || '';
+    private readonly apiUrl: string = trimTrailingSlash(process.env.OCTOPUS_URL || '');
 
     constructor(private readonly http: HttpService, private readonly systemHeartbeat: SystemHeartbeat) { }
 
@@ -16,7 +17,7 @@ export class OctopusService {
             const subscribedTo = (process.env.SUBSCRIBED_TO || '').split(',');
 
             const body = {
-                url: process.env.MY_PUBLIC_URL || '',
+                url: this.systemHeartbeat.myPublicUrl,
                 machineId: this.systemHeartbeat.machineId,
                 nickname: process.env.CUSTOMER_NAME || 'NO NAME CUSTOMER',
                 subscribedTo

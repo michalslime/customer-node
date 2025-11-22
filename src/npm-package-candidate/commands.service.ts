@@ -7,6 +7,7 @@ export class CommandsService {
     public lastFullfieldCommandTimestamp: number = Date.now();
 
     constructor(
+        public readonly machineName: string,
         private readonly source: string,
         private readonly sourceUrl,
         private readonly http: HttpService,

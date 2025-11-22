@@ -5,6 +5,7 @@ import { FillCommonIdMiddleware } from './fill-common-id.middleware';
 import { hashTo6Upper } from './utils';
 import { ModuleRef } from '@nestjs/core';
 import { FillMachineIdMiddleware } from './fill-machine-id.middleware';
+import { FillMachineNameMiddleware } from './fill-machine-name.middleware';
 
 export interface HeartbeatModuleOptions {
     applicationName: string;
@@ -13,22 +14,6 @@ export interface HeartbeatModuleOptions {
 }
 
 @Module({
-    providers: [
-        {
-            provide: 'COMMAND_CENTER_FACTORY',
-            useFactory: (moduleRef: ModuleRef) => {
-                return (name: string) => {
-                    const { CommandCenterService } = require('./command-center.service');
-
-                    const heartbeat = moduleRef.get(SystemHeartbeat, { strict: false });
-
-                    return new CommandCenterService(name, heartbeat);
-                };
-            },
-            inject: [ModuleRef],
-        },
-    ],
-    exports: ['COMMAND_CENTER_FACTORY'],
 })
 export class HeartbeatModule implements NestModule {
     static forRoot(options: HeartbeatModuleOptions): DynamicModule {
@@ -59,5 +44,6 @@ export class HeartbeatModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(FillCommonIdMiddleware).forRoutes('*');
         consumer.apply(FillMachineIdMiddleware).forRoutes('*');
+        consumer.apply(FillMachineNameMiddleware).forRoutes("*");
     }
 }

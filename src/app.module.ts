@@ -10,6 +10,7 @@ import { BybitInvestingLocalService } from './services/bybit-investing-local.ser
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { OctopusService } from './services/octopus.service';
+import { hashTo6Upper, trimTrailingSlash } from './npm-package-candidate/utils';
 
 @Module({
     imports: [
@@ -22,7 +23,7 @@ import { OctopusService } from './services/octopus.service';
         }),
         HeartbeatModule.forRoot({
             applicationName: 'customer-node',
-            machineUrl: process.env.MY_PUBLIC_URL || '',
+            machineUrl: trimTrailingSlash(process.env.MY_PUBLIC_URL || ''),
             workspace: process.env.WORKSPACE || 'NO_WORKSPACE'
         }),
     ],
@@ -48,9 +49,11 @@ import { OctopusService } from './services/octopus.service';
             provide: CommandsService,
             useFactory: (configService: ConfigService, httpService: HttpService, systemHeartbeat: SystemHeartbeat) => {
   
-                let octopusUrl = configService.get<string>('OCTOPUS_URL') ?? '';
+                let octopusUrl = trimTrailingSlash(configService.get<string>('OCTOPUS_URL') ?? '');
 
-                return new CommandsService('Octopus', `${octopusUrl}/customer/customer-commands`, httpService, systemHeartbeat);
+                const machineId = hashTo6Upper(octopusUrl);
+
+                return new CommandsService('Octopus', machineId, `${octopusUrl}/customer/customer-commands`, httpService, systemHeartbeat);
             },
             inject: [ConfigService, HttpService, SystemHeartbeat]
         },

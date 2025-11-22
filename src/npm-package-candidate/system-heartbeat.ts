@@ -1,5 +1,8 @@
 import { HttpService } from "@nestjs/axios";
+import { OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
+import { trimTrailingSlash } from "./utils";
 
 type Level = 'info' | 'warning' | 'error';
 
@@ -17,12 +20,28 @@ class LogEntry {
 let myPublicUrl: string = 'not-set-yet';
 let applicationStartTimestamp: number = Date.now();
 
-export class SystemHeartbeat {
-    private heartbeatUrl: string = process.env.HEARTBEAT_URL || '';
+export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
+    public myPublicUrl: string;
+    private heartbeatUrl: string = trimTrailingSlash(process.env.HEARTBEAT_URL || '');
     private lastTimestamp: number = Date.now();
+    private intervalId: NodeJS.Timeout | null = null;
 
-    constructor(private readonly http: HttpService, public readonly applicationName: string, public readonly machineId: string, myPublicUrl: string, public readonly workspace: string) { 
-        myPublicUrl = myPublicUrl;
+    constructor(private readonly http: HttpService, public readonly applicationName: string, public readonly machineId: string, myPublicUrl: string, public readonly workspace: string) {
+        const trimmed = trimTrailingSlash(myPublicUrl);
+        myPublicUrl = trimmed;
+        this.myPublicUrl = trimmed;
+    }
+
+    onModuleInit() {
+        this.intervalId = setInterval(() => {
+            this.logInfo(randomUUID(), `Heartbeat from ${this.machineId}`);
+        }, 60000);
+    }
+
+    onModuleDestroy() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
     }
 
     async logError(commonId: string, message: string, payload?: any): Promise<void> {
@@ -104,6 +123,14 @@ export function headers(initial?: Record<string, any>) {
             _headers = {
                 ..._headers,
                 'x-common-id': commonId,
+            };
+            return api;
+        },
+
+        withMachineName(machineName: string) {
+            _headers = {
+                ..._headers,
+                'x-machine-name': machineName,
             };
             return api;
         },
