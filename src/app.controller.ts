@@ -7,13 +7,15 @@ import { ErrorCodes } from './others/error-codes.enum';
 import { CommandsService } from './npm-package-candidate/commands.service';
 import { Position } from './models/position';
 import type { Request } from 'express';
+import { OctopusService } from './services/octopus.service';
 
 @Controller()
 export class AppController {
     constructor(private bybitInvestingService: BybitInvestingService,
         private investingService: InvestingService,
         private errorsService: ErrorsService,
-        private commandsService: CommandsService
+        private commandsService: CommandsService,
+        private octopusService: OctopusService
     ) { }
 
     @Post('ping')
@@ -63,6 +65,17 @@ export class AppController {
         try {
             const positions = await this.investingService.getPositionsAsync();
             return positions
+        } catch (error: any) {
+            this.handleError(error, request.commonId);
+        }
+    }
+
+    @Post('wake-up')
+    async wakeUp(@Req() request: Request): Promise<void> {
+        try {
+            await this.octopusService.registerMe(request.commonId);
+
+            return;
         } catch (error: any) {
             this.handleError(error, request.commonId);
         }
