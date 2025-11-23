@@ -2,7 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { OnModuleInit, OnModuleDestroy } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
-import { trimTrailingSlash } from "./utils";
+import { safeStringify, trimTrailingSlash } from "./utils";
 
 type Level = 'info' | 'warning' | 'error';
 
@@ -73,7 +73,7 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
                 message
             };
 
-            logEntry.payload = payload ? JSON.stringify(payload) : undefined;
+            logEntry.payload = payload ? safeStringify(payload) : undefined;
 
             this.lastTimestamp = logEntry.timestamp;
 
