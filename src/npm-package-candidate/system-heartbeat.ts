@@ -2,7 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { OnModuleInit, OnModuleDestroy } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
-import { safeStringify, trimTrailingSlash } from "./utils";
+import { toJson, trimTrailingSlash } from "./utils";
 
 type Level = 'info' | 'warning' | 'error';
 
@@ -73,12 +73,12 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
                 message
             };
 
-            logEntry.payload = payload ? safeStringify(payload) : undefined;
+            logEntry.payload = payload ? toJson(payload) : undefined;
 
             this.lastTimestamp = logEntry.timestamp;
 
             await firstValueFrom(
-                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, headers().withHeartbeatPassword().withMyPublicUrl().withAppStartTimestamp().build())
+                this.http.post(`${this.heartbeatUrl}/log-entry`, logEntry, headers().withCommonId(commonId).withHeartbeatPassword().withMyPublicUrl().withAppStartTimestamp().build())
             );
         } catch (error: any) {
             console.error(`Logging failed: ${error.message}`);

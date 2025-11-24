@@ -18,13 +18,41 @@ export function trimTrailingSlash(url: string): string {
   return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
-export function safeStringify(obj) {
+function safeStringify(obj: any): string {
   const seen = new WeakSet();
+
   return JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) return '[Circular]';
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) return "[Circular]";
       seen.add(value);
     }
     return value;
   });
+}
+
+export function toJson(data: any): string {
+  if (typeof data === "string") {
+    try {
+      JSON.parse(data);
+      return data;
+    } catch {
+      return JSON.stringify(data);
+    }
+  }
+
+  if (data instanceof Error) {
+    const errorObj = {
+      name: data.name,
+      message: data.message,
+      stack: data.stack,
+      ...data,
+    };
+    return safeStringify(errorObj);
+  }
+
+  try {
+    return JSON.stringify(data);
+  } catch {
+    return safeStringify(data);
+  }
 }
