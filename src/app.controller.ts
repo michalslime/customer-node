@@ -8,6 +8,7 @@ import { CommandsService } from './npm-package-candidate/commands.service';
 import { Position } from './models/position';
 import type { Request } from 'express';
 import { OctopusService } from './services/octopus.service';
+import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 
 @Controller()
 export class AppController {
@@ -15,7 +16,8 @@ export class AppController {
         private investingService: InvestingService,
         private errorsService: ErrorsService,
         private commandsService: CommandsService,
-        private octopusService: OctopusService
+        private octopusService: OctopusService,
+        private readonly systemHeartbeat: SystemHeartbeat
     ) { }
 
     @Post('ping')
@@ -78,6 +80,15 @@ export class AppController {
             return;
         } catch (error: any) {
             this.handleError(error, request.commonId);
+        }
+    }
+
+    @Get('my-machine-id')
+    async myMachineId(@Req() request: Request): Promise<string> {
+        try {
+            return this.systemHeartbeat.machineId;
+        } catch (err: any) {
+            this.handleError(err, request.commonId);
         }
     }
 
