@@ -1,6 +1,14 @@
 import { Coin } from "src/models/bybit-investing";
 
-export type CommandType = 'SET_STOP_LOSS' | 'CLOSE_POSITION' | 'SET_SOFT_STOP_LOSS' | 'SET_PNL_STOP_LOSS' | 'OPEN_POSITION';
+export type CommandType =
+    'SET_STOP_LOSS' |
+    'CLOSE_POSITION' |
+    'SET_SOFT_STOP_LOSS' |
+    'SET_PNL_STOP_LOSS' |
+    'OPEN_POSITION' |
+    'RESTORE_COMMON_ID_FOR_POSITION' |
+    'UPDATE_ONCHAIN_DATA' |
+    'RESTORE_DATA_FROM_ONCHAIN';
 
 export class Command<T> {
     createdTimestamp: number;

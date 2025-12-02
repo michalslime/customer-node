@@ -16,6 +16,7 @@ export class CommandsService {
 
     public async getCommandsAsync(commonId: string): Promise<Command<any>[]> {
         try {
+            this.systemHeartbeat.logWarn(commonId, 'Timestamp at fetching', this.lastFullfieldCommandTimestamp);
             const url = `${this.sourceUrl}/${this.lastFullfieldCommandTimestamp}`;
 
             this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url: url });

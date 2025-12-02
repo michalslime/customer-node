@@ -15,13 +15,15 @@ class LogEntry {
     level: Level;
     message: string;
     payload?: any;
+    sendEmail?: boolean;
 }
 
 let myPublicUrl: string = 'not-set-yet';
-let applicationStartTimestamp: number = Date.now();
+const applicationStartTimestamp: number = Date.now();
 
 export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
     public myPublicUrl: string;
+    public readonly applicationStartTimestamp: number = applicationStartTimestamp;
     private heartbeatUrl: string = trimTrailingSlash(process.env.HEARTBEAT_URL || '');
     private lastTimestamp: number = Date.now();
     private intervalId: NodeJS.Timeout | null = null;
@@ -44,19 +46,19 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    async logError(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('error', commonId, message, payload);
+    async logError(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
+        this.log('error', commonId, message, payload, sendEmail);
     }
 
-    async logWarn(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('warning', commonId, message, payload);
+    async logWarn(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
+        this.log('warning', commonId, message, payload, sendEmail);
     }
 
-    async logInfo(commonId: string, message: string, payload?: any): Promise<void> {
-        this.log('info', commonId, message, payload);
+    async logInfo(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
+        this.log('info', commonId, message, payload, sendEmail);
     }
 
-    private async log(level: Level, commonId: string, message: string, payload?: any): Promise<void> {
+    private async log(level: Level, commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
         if (!this.heartbeatUrl) {
             console.warn('HEARTBEAT_URL is not set. Skipping heartbeat.');
             return;
@@ -74,6 +76,7 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
             };
 
             logEntry.payload = payload ? toJson(payload) : undefined;
+            logEntry.sendEmail = sendEmail ? sendEmail : false;
 
             this.lastTimestamp = logEntry.timestamp;
 
@@ -103,6 +106,26 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
         } catch (error: any) {
             console.error(`Retrieving logs failed: ${error.message}`);
             return [];
+        }
+    }
+
+    async isSystemHealthy(): Promise<boolean> {
+        if (!this.heartbeatUrl) {
+            console.warn('HEARTBEAT_URL is not set. Skipping heartbeat.');
+            return false;
+        }
+
+        try {
+            const response = await firstValueFrom(
+                this.http.get<boolean>(`${this.heartbeatUrl}/workspaces/${this.workspace}/is-healthy`, headers().withHeartbeatPassword().build())
+            );
+
+            const isSystemHealthy = response.data;
+
+            return isSystemHealthy
+        } catch (error: any) {
+            console.error(`Retrieving is healthy status failed: ${error.message}`);
+            return false;
         }
     }
 }
