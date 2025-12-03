@@ -72,11 +72,11 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
                 workspace: this.workspace,
                 timestamp: Date.now() === this.lastTimestamp ? Date.now() + 1 : Date.now(),
                 level: level,
-                message
+                message,
+                sendEmail
             };
 
             logEntry.payload = payload ? toJson(payload) : undefined;
-            logEntry.sendEmail = sendEmail ? sendEmail : false;
 
             this.lastTimestamp = logEntry.timestamp;
 
@@ -127,6 +127,14 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
             console.error(`Retrieving is healthy status failed: ${error.message}`);
             return false;
         }
+    }
+
+    async getAppStartTimestampAsync(commonId: string, machineId: string): Promise<number> {
+        const response = await firstValueFrom(
+            this.http.get<number>(`${this.heartbeatUrl}/machines/${machineId}/app-start-timestamp`, headers().withCommonId(commonId).withHeartbeatPassword().build())
+        );
+
+        return response.data;
     }
 }
 

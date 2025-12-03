@@ -6,5 +6,6 @@ declare module 'express' {
     commonId: string;
     machineId: string | null;
     machineName: string | null;
+    requesterUrl: string;
   }
 }
