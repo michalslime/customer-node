@@ -2,7 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { OnModuleInit, OnModuleDestroy } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { firstValueFrom } from "rxjs";
-import { toJson, trimTrailingSlash } from "./utils";
+import { toJson, trimTrailingSlash } from "./utils/utils";
 
 type Level = 'info' | 'warning' | 'error';
 

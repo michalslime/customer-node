@@ -8,7 +8,8 @@ export type CommandType =
     'OPEN_POSITION' |
     'RESTORE_COMMON_ID_FOR_POSITION' |
     'UPDATE_ONCHAIN_DATA' |
-    'RESTORE_DATA_FROM_ONCHAIN';
+    'RESTORE_DATA_FROM_ONCHAIN' |
+    'SAVE_HISTORICAL_POSITION';
 
 export class Command<T> {
     createdTimestamp: number;

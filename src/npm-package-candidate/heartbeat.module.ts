@@ -2,10 +2,9 @@ import { MiddlewareConsumer, Module, NestModule, DynamicModule } from '@nestjs/c
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { SystemHeartbeat } from './system-heartbeat';
 import { FillCommonIdMiddleware } from './fill-common-id.middleware';
-import { hashTo6Upper } from './utils';
-import { ModuleRef } from '@nestjs/core';
 import { FillMachineIdMiddleware } from './fill-machine-id.middleware';
 import { FillMachineNameMiddleware } from './fill-machine-name.middleware';
+import { hashTo6Upper } from './utils/utils';
 
 export interface HeartbeatModuleOptions {
     applicationName: string;

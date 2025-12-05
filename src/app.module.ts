@@ -10,7 +10,7 @@ import { BybitInvestingLocalService } from './services/bybit-investing-local.ser
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { OctopusService } from './services/octopus.service';
-import { hashTo6Upper, trimTrailingSlash } from './npm-package-candidate/utils';
+import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/utils';
 
 @Module({
     imports: [
