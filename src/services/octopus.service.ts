@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { headers, SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
+import { trimTrailingSlash } from 'src/npm-package-candidate/utils/utils';
 
 @Injectable()
 export class OctopusService {
@@ -32,7 +33,3 @@ export class OctopusService {
         }
     }
 }
-function trimTrailingSlash(arg0: string): string {
-    throw new Error('Function not implemented.');
-}
-
