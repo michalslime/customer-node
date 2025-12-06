@@ -1,6 +1,5 @@
 import { Controller, Get, HttpException, HttpStatus, Param, Post, Req } from '@nestjs/common';
 import type { Coin } from './models/bybit-investing';
-import { BybitInvestingService } from './services/bybit-investing.service';
 import { ErrorsService } from './services/errors.service';
 import { InvestingService } from './services/investing.service';
 import { ErrorCodes } from './others/error-codes.enum';
@@ -9,10 +8,13 @@ import { Position } from './models/position';
 import type { Request } from 'express';
 import { OctopusService } from './services/octopus.service';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
+import { EXCHANGE_SERVICE, ExchangeService } from './services/exchange.service';
 
 @Controller()
 export class AppController {
-    constructor(private bybitInvestingService: BybitInvestingService,
+    constructor(
+        @Inject(EXCHANGE_SERVICE)
+        private exchangeService: ExchangeService,
         private investingService: InvestingService,
         private errorsService: ErrorsService,
         private commandsService: CommandsService,
@@ -35,7 +37,7 @@ export class AppController {
     async getPrice(@Req() request: Request, @Param('coin') coin: Coin): Promise<number> {
         console.log(coin);
         try {
-            const price = await this.bybitInvestingService.getPriceAsync(request.commonId, coin);
+            const price = await this.exchangeService.getPriceAsync(request.commonId, coin);
             return price || 0;
         } catch (error: any) {
             this.handleError(error, request.commonId);
@@ -45,7 +47,7 @@ export class AppController {
     @Get('wallet-balance/total')
     async getWalletTotalBalance(@Req() request: Request): Promise<number> {
         try {
-            const wallet = await this.bybitInvestingService.getWalletBalanceAsync(request.commonId);
+            const wallet = await this.exchangeService.getWalletBalanceAsync(request.commonId);
             return wallet.totalAmount;
         } catch (error: any) {
             this.handleError(error, request.commonId);
@@ -55,7 +57,7 @@ export class AppController {
     @Get('wallet-balance/available')
     async getWalletAvailableBalance(@Req() request: Request): Promise<number> {
         try {
-            const wallet = await this.bybitInvestingService.getWalletBalanceAsync(request.commonId);
+            const wallet = await this.exchangeService.getWalletBalanceAsync(request.commonId);
             return wallet.availableAmount;
         } catch (error: any) {
             this.handleError(error, request.commonId);
@@ -111,3 +113,7 @@ export class AppController {
         }
     }
 }
+function Inject(EXCHANGE_SERVICE: any): (target: typeof AppController, propertyKey: undefined, parameterIndex: 0) => void {
+    throw new Error('Function not implemented.');
+}
+
