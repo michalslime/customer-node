@@ -6,11 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InvestingService } from './services/investing.service';
 import { CommandsService } from './npm-package-candidate/commands.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { BybitInvestingLocalService } from './services/bybit-investing-local.service';
 import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { OctopusService } from './services/octopus.service';
 import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/utils';
+import { EXCHANGE_SERVICE } from './services/exchange.service';
 
 @Module({
     imports: [
@@ -31,16 +31,21 @@ import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/u
     providers: [
         ErrorsService,
         {
-            provide: BybitInvestingService,
+            provide: EXCHANGE_SERVICE,
             useFactory: (configService: ConfigService, errorsService: ErrorsService, systemHeartbeat: SystemHeartbeat) => {
-                if (process.env.NODE_ENV === 'development') {
-                    return new BybitInvestingLocalService(errorsService);
-                }
-                
-                let apiKey = configService.get<string>('BYBIT_INVESTING_API_KEY') ?? '';
-                let secret = configService.get<string>('BYBIT_INVESTING_API_SECRET') ?? '';
+                // if (process.env.NODE_ENV === 'development') {
+                //     return new BybitInvestingLocalService(errorsService);
+                // }
 
-                return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
+                let apiKey = configService.get<string>('EXCHANGE_API_KEY') ?? '';
+                let secret = configService.get<string>('EXCHANGE_API_SECRET') ?? '';
+
+                switch (process.env.EXCHANG) {
+                    case 'bybit':
+                        return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
+                    default:
+                        return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
+                }
             },
             inject: [ConfigService, ErrorsService, SystemHeartbeat]
         },
@@ -48,7 +53,7 @@ import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/u
         {
             provide: CommandsService,
             useFactory: (configService: ConfigService, httpService: HttpService, systemHeartbeat: SystemHeartbeat) => {
-  
+
                 let octopusUrl = trimTrailingSlash(configService.get<string>('OCTOPUS_URL') ?? '');
 
                 const machineId = hashTo6Upper(octopusUrl);
@@ -58,9 +63,10 @@ import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/u
             inject: [ConfigService, HttpService, SystemHeartbeat]
         },
         OctopusService
-        
+
     ],
+    exports: [EXCHANGE_SERVICE]
 })
-export class AppModule { 
+export class AppModule {
 }
 

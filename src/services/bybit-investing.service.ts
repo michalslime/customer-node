@@ -5,9 +5,10 @@ import { Position, PositionMapper } from 'src/models/position';
 import { WalletBalance } from 'src/models/wallet';
 import { ErrorsService } from './errors.service';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
+import { ExchangeService } from './exchange.service';
 
 @Injectable()
-export class BybitInvestingService {
+export class BybitInvestingService extends ExchangeService {
     private readonly url: string;
     private readonly bybitRestClientV5: RestClientV5;
 
@@ -17,6 +18,7 @@ export class BybitInvestingService {
         private errorsService: ErrorsService,
         private systemHeartbeat: SystemHeartbeat
     ) {
+        super();
         this.url = 'https://api.bybit.com';
         this.bybitRestClientV5 = new RestClientV5({
             key: this.apiKey,
