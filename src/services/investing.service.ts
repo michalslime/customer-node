@@ -73,9 +73,13 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
 
     private startRefreshingPositions() {
         this.intervalId = setInterval(async () => {
-            const positions = await this.exchange.getPositionInfoAsync('interal');
-
-            this.positionsSubject.next(positions);
+            try {
+                const positions = await this.exchange.getPositionInfoAsync('interal');
+                this.positionsSubject.next(positions);
+            } catch (error) {
+                this.systemHeartbeat.logError('internal', 'Error refreshing positions', error);
+                this.positionsSubject.next([]);
+            }
         }, 3000);
     }
 }

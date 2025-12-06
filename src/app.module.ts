@@ -11,6 +11,7 @@ import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { OctopusService } from './services/octopus.service';
 import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/utils';
 import { EXCHANGE_SERVICE } from './services/exchange.service';
+import { BingxService } from './services/bingx.service';
 
 @Module({
     imports: [
@@ -40,7 +41,9 @@ import { EXCHANGE_SERVICE } from './services/exchange.service';
                 let apiKey = configService.get<string>('EXCHANGE_API_KEY') ?? '';
                 let secret = configService.get<string>('EXCHANGE_API_SECRET') ?? '';
 
-                switch (process.env.EXCHANG) {
+                switch (process.env.EXCHANGE) {
+                    case 'bingx':
+                        return new BingxService(apiKey, secret);
                     case 'bybit':
                         return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
                     default:

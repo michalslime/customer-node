@@ -12,7 +12,6 @@
     "production": "PORT=3002 NODE_ENV=production nest start",
     "start:staging": "NODE_ENV=staging node dist/main",
     "start:prod": "NODE_ENV=production node dist/main",
-
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -22,14 +21,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/config": "4.0.2",
     "@nestjs/axios": "4.0.1",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "4.0.2",
+    "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "bybit-api": "^4.0.1",
+    "crypto-js": "^4.2.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "bybit-api": "^4.0.1"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

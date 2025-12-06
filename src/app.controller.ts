@@ -47,6 +47,7 @@ export class AppController {
     @Get('wallet-balance/total')
     async getWalletTotalBalance(@Req() request: Request): Promise<number> {
         try {
+            console.log('Getting total wallet balance');
             const wallet = await this.exchangeService.getWalletBalanceAsync(request.commonId);
             return wallet.totalAmount;
         } catch (error: any) {
