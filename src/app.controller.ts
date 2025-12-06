@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Req } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req } from '@nestjs/common';
 import type { Coin } from './models/bybit-investing';
 import { ErrorsService } from './services/errors.service';
 import { InvestingService } from './services/investing.service';
@@ -113,7 +113,5 @@ export class AppController {
         }
     }
 }
-function Inject(EXCHANGE_SERVICE: any): (target: typeof AppController, propertyKey: undefined, parameterIndex: 0) => void {
-    throw new Error('Function not implemented.');
-}
+
 
