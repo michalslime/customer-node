@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ErrorsService } from './services/errors.service';
-import { BybitInvestingService } from './services/bybit-investing.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { InvestingService } from './services/investing.service';
 import { CommandsService } from './npm-package-candidate/commands.service';
@@ -10,8 +9,7 @@ import { HeartbeatModule } from './npm-package-candidate/heartbeat.module';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { OctopusService } from './services/octopus.service';
 import { trimTrailingSlash, hashTo6Upper } from './npm-package-candidate/utils/utils';
-import { EXCHANGE_SERVICE } from './services/exchange.service';
-import { BingxService } from './services/bingx.service';
+import { ExchangeModule } from './npm-package-exchanges/exchange.module';
 
 @Module({
     imports: [
@@ -27,31 +25,11 @@ import { BingxService } from './services/bingx.service';
             machineUrl: trimTrailingSlash(process.env.MY_PUBLIC_URL || ''),
             workspace: process.env.WORKSPACE || 'NO_WORKSPACE'
         }),
+        ExchangeModule
     ],
     controllers: [AppController],
     providers: [
         ErrorsService,
-        {
-            provide: EXCHANGE_SERVICE,
-            useFactory: (configService: ConfigService, errorsService: ErrorsService, systemHeartbeat: SystemHeartbeat) => {
-                // if (process.env.NODE_ENV === 'development') {
-                //     return new BybitInvestingLocalService(errorsService);
-                // }
-
-                let apiKey = configService.get<string>('EXCHANGE_API_KEY') ?? '';
-                let secret = configService.get<string>('EXCHANGE_API_SECRET') ?? '';
-
-                switch (process.env.EXCHANGE) {
-                    case 'bingx':
-                        return new BingxService(apiKey, secret);
-                    case 'bybit':
-                        return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
-                    default:
-                        return new BybitInvestingService(apiKey, secret, errorsService, systemHeartbeat);
-                }
-            },
-            inject: [ConfigService, ErrorsService, SystemHeartbeat]
-        },
         InvestingService,
         {
             provide: CommandsService,
@@ -67,8 +45,7 @@ import { BingxService } from './services/bingx.service';
         },
         OctopusService
 
-    ],
-    exports: [EXCHANGE_SERVICE]
+    ]
 })
 export class AppModule {
 }

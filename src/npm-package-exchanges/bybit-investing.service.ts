@@ -3,7 +3,7 @@ import { RestClientV5 } from 'bybit-api';
 import { Coin, Leverage, Percentage, Side, USDTCoin } from 'src/models/bybit-investing';
 import { Position, PositionMapper } from 'src/models/position';
 import { WalletBalance } from 'src/models/wallet';
-import { ErrorsService } from './errors.service';
+import { ErrorsService } from '../services/errors.service';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { ExchangeService } from './exchange.service';
 
@@ -15,7 +15,6 @@ export class BybitInvestingService extends ExchangeService {
     constructor(
         private readonly apiKey: string,
         private readonly secret: string,
-        private errorsService: ErrorsService,
         private systemHeartbeat: SystemHeartbeat
     ) {
         super();
@@ -36,7 +35,6 @@ export class BybitInvestingService extends ExchangeService {
                 symbol: symbol,
             });
         } catch (error) {
-            this.errorsService.addError('Error at setLeverageAsync', error, commonId);
             throw error;
         }
     }
@@ -59,7 +57,6 @@ export class BybitInvestingService extends ExchangeService {
 
             return wallet;
         } catch (error) {
-            this.errorsService.addError('Error at getWalletBalanceAsync', error, commonId);
             throw error;
         }
     }
@@ -77,7 +74,6 @@ export class BybitInvestingService extends ExchangeService {
 
             return positions;
         } catch (error) {
-            this.errorsService.addError('Error at getPositionInfoAsync', error, commonId);
             throw error;
         }
     }
@@ -92,7 +88,6 @@ export class BybitInvestingService extends ExchangeService {
 
             await this.openPositionAsync(commonId, coin, side, qty);
         } catch (error) {
-            this.errorsService.addError('Error at newOrderAsync', error, commonId);
             throw error;
         }
     }
@@ -102,7 +97,6 @@ export class BybitInvestingService extends ExchangeService {
             const symbol = `${coin}USDT`;
             await this.submitOrderWithPrecisionAsync(commonId, qty, 3, symbol, side);
         } catch (error) {
-            this.errorsService.addError('Error at openPositionAsync', error, commonId);
             throw error;
         }
     }
@@ -122,7 +116,6 @@ export class BybitInvestingService extends ExchangeService {
 
             return price;
         } catch (error) {
-            this.errorsService.addError('Error at getPriceAsync', error, commonId);
             throw error;
         }
     }
@@ -145,7 +138,6 @@ export class BybitInvestingService extends ExchangeService {
 
             await this.openPositionAsync(commonId, coin, position.side === 'Buy' ? 'Sell' : 'Buy', quantity);
         } catch (error) {
-            this.errorsService.addError('Error at closePositionAsync', error, commonId);
             throw error;
         }
     }
@@ -162,7 +154,6 @@ export class BybitInvestingService extends ExchangeService {
                 positionIdx: 0,
             });
         } catch (error) {
-            this.errorsService.addError('Error at setting stop loss', error, commonId);
             throw error;
         }        
     }
@@ -190,7 +181,6 @@ export class BybitInvestingService extends ExchangeService {
                 throw new Error(response.retMsg);
             }
         } catch (error) {
-            this.errorsService.addError(`Error at submitting order (Symbol: ${symbol}, Side: ${side}, Qty: ${formattedQty}):`, error, commonId);
             throw error;
         }
     }

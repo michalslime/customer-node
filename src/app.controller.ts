@@ -8,7 +8,7 @@ import { Position } from './models/position';
 import type { Request } from 'express';
 import { OctopusService } from './services/octopus.service';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
-import { EXCHANGE_SERVICE, ExchangeService } from './services/exchange.service';
+import { EXCHANGE_SERVICE, ExchangeService } from './npm-package-exchanges/exchange.service';
 
 @Controller()
 export class AppController {
