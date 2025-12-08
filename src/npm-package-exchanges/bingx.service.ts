@@ -310,7 +310,7 @@ export class BingxService extends ExchangeService {
             throw new Error(`No open position found for ${symbol}.`);
         }
 
-        const positionSide = pos.side === 'Buy' ? 'LONG' : 'SHORT';
+        const positionSide = "BOTH";
         const side = pos.side === 'Buy' ? 'SELL' : 'BUY'; // SL logic
 
         const payload: Record<string, any> = {

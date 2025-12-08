@@ -1,3 +1,4 @@
+import { Subject } from "rxjs";
 import { Coin } from "src/models/bybit-investing";
 
 export type CommandType =
@@ -12,8 +13,11 @@ export type CommandType =
     'SAVE_HISTORICAL_POSITION';
 
 export class Command<T> {
+    commonId: string;
     createdTimestamp: number;
     coin: Coin;
     type: CommandType;
-    payload: T;
+    payload?: T;
 }
+
+export const commands$ = new Subject<Command<any>>();

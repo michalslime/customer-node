@@ -16,6 +16,7 @@ class LogEntry {
     message: string;
     payload?: any;
     sendEmail?: boolean;
+    title?: string;
 }
 
 let myPublicUrl: string = 'not-set-yet';
@@ -46,19 +47,19 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
         }
     }
 
-    async logError(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
-        this.log('error', commonId, message, payload, sendEmail);
+    async logError(commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {
+        this.log('error', commonId, message, payload, sendEmail, title);
     }
 
-    async logWarn(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
-        this.log('warning', commonId, message, payload, sendEmail);
+    async logWarn(commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {
+        this.log('warning', commonId, message, payload, sendEmail, title);
     }
 
-    async logInfo(commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
-        this.log('info', commonId, message, payload, sendEmail);
+    async logInfo(commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {
+        this.log('info', commonId, message, payload, sendEmail, title);
     }
 
-    private async log(level: Level, commonId: string, message: string, payload?: any, sendEmail?: boolean): Promise<void> {
+    private async log(level: Level, commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {
         if (!this.heartbeatUrl) {
             console.warn('HEARTBEAT_URL is not set. Skipping heartbeat.');
             return;
@@ -73,7 +74,8 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
                 timestamp: Date.now() === this.lastTimestamp ? Date.now() + 1 : Date.now(),
                 level: level,
                 message,
-                sendEmail
+                sendEmail,
+                title
             };
 
             logEntry.payload = payload ? toJson(payload) : undefined;

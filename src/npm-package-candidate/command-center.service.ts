@@ -1,5 +1,6 @@
 import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
-import { Command } from "./command";
+import { Command, CommandType } from "./command";
+import { Coin } from "src/models/bybit-investing";
 
 export class CommandCenterService {
     private commandQueue: Command<any>[] = [];
@@ -9,14 +10,25 @@ export class CommandCenterService {
         private readonly systemHeartbeat: SystemHeartbeat,
     ) { }
 
-    enqueueCommand<T>(command: Command<T>, commonId: string) {
+    public enqueueCommand<T>(command: Command<T>, commonId: string): void {
         this.systemHeartbeat.logInfo(commonId, `Enqueuing command of type ${command.type} created at ${command.createdTimestamp} into ${this.name}`, command);
         this.commandQueue.push(command);
     }
 
-    popCommands(timestamp: number, commonId: string): Command<any>[] {
+    public popCommands(timestamp: number, commonId: string): Command<any>[] {
         const commandsToReturn = this.commandQueue.filter(cmd => cmd.createdTimestamp > timestamp);
         this.systemHeartbeat.logInfo(commonId, `Popping commands created after ${timestamp} for ${this.name}`, commandsToReturn);
         return commandsToReturn;
+    }
+
+    public generateCommand<T>(commonId: string, coin: Coin, type: CommandType, payload?: T): Command<T> {
+        const command = new Command<T>();
+        command.commonId = commonId;
+        command.coin = coin;
+        command.createdTimestamp = Date.now();
+        command.type = type;
+        command.payload = payload;
+
+        return command
     }
 }

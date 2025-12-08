@@ -5,8 +5,6 @@ interface RetryOptions<T> {
     initialInterval: number;
     multiplier: number;
     retries: number;
-    onSuccess: (result: T) => void;
-    onFailure: (error: unknown) => void;
 }
 
 export function retryInvokes<T>({
@@ -14,32 +12,29 @@ export function retryInvokes<T>({
     initialInterval,
     multiplier,
     retries,
-    onSuccess,
-    onFailure,
-}: RetryOptions<T>) {
-    let attempt = 0;
-    let currentInterval = initialInterval;
+}: RetryOptions<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+        let attempt = 0;
+        let currentInterval = initialInterval;
 
-    const execute = async () => {
-        try {
-            const result = await task();
-            onSuccess(result);
-        } catch (err) {
-            attempt++;
+        const execute = async () => {
+            try {
+                const result = await task();
+                resolve(result);
+            } catch (err) {
+                attempt++;
 
-            if (attempt > retries) {
-                onFailure(err);
-                return;
+                if (attempt > retries) {
+                    reject(err);
+                    return;
+                }
+
+                currentInterval *= multiplier;
+
+                setTimeout(execute, currentInterval);
             }
+        };
 
-            currentInterval = currentInterval * multiplier;
-
-            setTimeout(() => {
-                execute();
-            }, currentInterval);
-        }
-    };
-
-    // Start pierwszej próby
-    setTimeout(execute, initialInterval);
+        setTimeout(execute, initialInterval);
+    });
 }

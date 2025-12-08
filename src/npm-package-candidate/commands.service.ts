@@ -1,6 +1,6 @@
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
-import { Command } from "src/npm-package-candidate/command";
+import { Command, CommandType } from "src/npm-package-candidate/command";
 import { headers, SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 
 export class CommandsService {
@@ -19,18 +19,29 @@ export class CommandsService {
             this.systemHeartbeat.logWarn(commonId, 'Timestamp at fetching', this.lastFullfieldCommandTimestamp);
             const url = `${this.sourceUrl}/${this.lastFullfieldCommandTimestamp}`;
 
-            this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url: url });
+            this.systemHeartbeat.logInfo(commonId, `Fetching commands from ${this.source}`, { url });
 
             const response = await firstValueFrom(
-                this.http.get<Command<any>[]>(url, headers().withCommonId(commonId).withMachineId(this.systemHeartbeat.machineId).build())
+                this.http.get<Command<any>[]>(
+                    url,
+                    headers()
+                        .withCommonId(commonId)
+                        .withMachineId(this.systemHeartbeat.machineId)
+                        .build()
+                )
             );
 
-            const commands = response.data;
-            const sortedCommands =  commands.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+            const apiCommands = response.data ?? [];
 
-            this.systemHeartbeat.logInfo(commonId, `Fetched ${sortedCommands.length} commands from ${this.source}`, sortedCommands);
+            const sorted = apiCommands.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-            return sortedCommands;
+            this.systemHeartbeat.logInfo(
+                commonId,
+                `Fetched ${apiCommands.length} API commands from ${this.source}`,
+                sorted
+            );
+
+            return sorted;
         } catch (error: any) {
             throw new Error(`Failed to fetch commands: ${error.message}`);
         }
