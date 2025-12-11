@@ -80,7 +80,7 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                         initialInterval: 3000,
                         multiplier: 1.5,
                         retries: 3
-                    })
+                    });
 
                     break;
                 default:

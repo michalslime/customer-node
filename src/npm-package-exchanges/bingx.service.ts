@@ -322,7 +322,7 @@ export class BingxService extends ExchangeService {
             quantity: pos.size.toString(),
         };
 
-        console.log(JSON.stringify(payload));
+        console.log(payload.stopPrice);
 
         const timestamp = Date.now();
 
@@ -347,7 +347,6 @@ export class BingxService extends ExchangeService {
                 'X-BX-APIKEY': this.apiKey,
             },
             transformResponse: (resp: any) => {
-                console.log(resp); // debug big-int
                 return resp;
             }
         };
@@ -395,7 +394,6 @@ export class BingxService extends ExchangeService {
             },
             transformResponse: (resp: any) => {
                 // big-int debug (zalecane przez BingX)
-                console.log(resp);
                 return resp;
             },
         };
@@ -405,8 +403,6 @@ export class BingxService extends ExchangeService {
         if (resp.status !== 200) {
             throw new Error(`Failed to set dual mode: ${resp.status}`);
         }
-
-        console.log("Dual Position Mode updated:", resp.data);
     }
 
     private buildParameters(payload: any, timestamp: number, urlEncode = false): string {
