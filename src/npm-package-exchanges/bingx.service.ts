@@ -322,6 +322,8 @@ export class BingxService extends ExchangeService {
             quantity: pos.size.toString(),
         };
 
+        console.log(JSON.stringify(payload));
+
         const timestamp = Date.now();
 
         const params = Object.entries(payload)

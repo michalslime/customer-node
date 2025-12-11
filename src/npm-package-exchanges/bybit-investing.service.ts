@@ -145,6 +145,8 @@ export class BybitInvestingService extends ExchangeService {
     public async setStopLossAsync(commonId: string, coin: Coin, stopLossPrice: number) {
         const symbol = coin + USDTCoin;
 
+        console.log(stopLossPrice);
+
         try {
             await this.bybitRestClientV5.setTradingStop({
                 category: 'linear',
