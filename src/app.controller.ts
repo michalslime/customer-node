@@ -108,8 +108,7 @@ export class AppController {
             throw new HttpException(error.message, HttpStatus.CONFLICT);
         } else if (error.message === ErrorCodes.DEPO_EXCEEDED) {
             throw new HttpException(error.message, HttpStatus.CONFLICT);
-        } else
-            {
+        } else {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

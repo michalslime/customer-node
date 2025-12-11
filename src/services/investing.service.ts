@@ -6,6 +6,7 @@ import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { OctopusService } from './octopus.service';
 import { randomUUID } from 'crypto';
 import { EXCHANGE_SERVICE, ExchangeService } from '../npm-package-exchanges/exchange.service';
+import { retryInvokes } from 'src/npm-package-candidate/utils/retry-invokes';
 
 
 @Injectable()
@@ -62,13 +63,24 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                     await this.exchange.newOrderAsync(commonId, command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
                     const price = await this.exchange.getPriceAsync(commonId, command.coin);
 
-                    setTimeout(() => {
-                        const stopLoss = command.payload.side === 'Buy' ? price * 0.96 : price * 1.04;
-                        this.exchange.setStopLossAsync(commonId, command.coin, stopLoss).catch((error) => {
-                            this.systemHeartbeat.logError(commonId, `Setting SL failed for ${command.coin} at ${stopLoss}`, error);
-                        });
-                    }, 5000);
-                    
+                    retryInvokes({
+                        task: async () => {
+                            const positions = await this.exchange.getPositionInfoAsync(commonId);
+
+                            if (positions.findIndex(x => x.coin === command.coin)) {
+                                const stopLoss = command.payload.stopLoss;
+                                this.exchange.setStopLossAsync(commonId, command.coin, stopLoss).catch((error) => {
+                                    this.systemHeartbeat.logError(commonId, `Setting SL failed for ${command.coin} at ${stopLoss}`, error);
+                                });
+                            } else {
+                                throw new Error('Position not created yet')
+                            }
+                        },
+                        initialInterval: 3000,
+                        multiplier: 1.5,
+                        retries: 3
+                    })
+
                     break;
                 default:
                     this.systemHeartbeat.logWarn(commonId, `Unknown command type: ${command.type}`, command);
