@@ -35,7 +35,6 @@ export class AppController {
 
     @Get('price/:coin')
     async getPrice(@Req() request: Request, @Param('coin') coin: Coin): Promise<number> {
-        console.log(coin);
         try {
             const price = await this.exchangeService.getPriceAsync(request.commonId, coin);
             return price || 0;
@@ -47,7 +46,6 @@ export class AppController {
     @Get('wallet-balance/total')
     async getWalletTotalBalance(@Req() request: Request): Promise<number> {
         try {
-            console.log('Getting total wallet balance');
             const wallet = await this.exchangeService.getWalletBalanceAsync(request.commonId);
             return wallet.totalAmount;
         } catch (error: any) {

@@ -361,8 +361,6 @@ export class BingxService extends ExchangeService {
         if (resp.status !== 200) {
             throw new Error(`BingX SL failed: ${resp.status}`);
         }
-
-        console.log('Stop Loss set:', resp.data);
     }
 
     private async setDualPositionMode(dual: boolean): Promise<void> {
