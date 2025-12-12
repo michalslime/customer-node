@@ -66,9 +66,9 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                         task: async () => {
                             const positions = await this.exchange.getPositionInfoAsync(commonId);
 
-                            if (positions.findIndex(x => x.coin === command.coin) < -1) {
+                            if (positions.findIndex(x => x.coin === command.coin) >= 0) {
                                 const stopLoss = command.payload.stopLoss;
-                                console.log(stopLoss);
+
                                 this.exchange.setStopLossAsync(commonId, command.coin, stopLoss).catch((error) => {
                                     this.systemHeartbeat.logError(commonId, `Setting SL failed for ${command.coin} at ${stopLoss}`, error);
                                 });
