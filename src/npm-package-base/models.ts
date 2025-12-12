@@ -11,3 +11,8 @@ export class Position {
     size: number;
     originalPosition: any;
 }
+
+export class WalletBalance {
+    availableAmount: number;
+    totalAmount: number;
+}

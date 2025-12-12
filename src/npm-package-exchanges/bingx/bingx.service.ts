@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import { ExchangeService } from '../exchange.service';
-import { WalletBalance } from 'src/models/wallet';
 import { Coin, Leverage, Percentage, Side, USDTCoin } from '../../npm-package-base/types';
-import { Position } from '../../npm-package-base/models';
+import { Position, WalletBalance } from '../../npm-package-base/models';
 
 @Injectable()
 export class BingxService extends ExchangeService {
