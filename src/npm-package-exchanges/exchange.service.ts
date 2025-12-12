@@ -8,6 +8,7 @@ export abstract class ExchangeService {
   abstract setLeverageAsync(commonId: string, coin: Coin, leverage: Leverage): Promise<void>;
   abstract getWalletBalanceAsync(commonId: string): Promise<WalletBalance>;
   abstract getPositionInfoAsync(commonId: string): Promise<Position[]>;
+  abstract getPositionsHistory(commonId: string): Promise<any[]>;
   abstract newOrderAsync(commonId: string, coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void>;
   abstract openPositionAsync(commonId: string, coin: Coin, side: Side, qty: number): Promise<void>;
   abstract getPriceAsync(commonId: string, coin: Coin): Promise<number>;

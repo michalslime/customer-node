@@ -3,12 +3,12 @@ import { RestClientV5 } from 'bybit-api';
 import { Coin, Leverage, Percentage, Side, USDTCoin } from 'src/models/bybit-investing';
 import { Position, PositionMapper } from 'src/models/position';
 import { WalletBalance } from 'src/models/wallet';
-import { ErrorsService } from '../services/errors.service';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { ExchangeService } from './exchange.service';
 
 @Injectable()
 export class BybitInvestingService extends ExchangeService {
+    
     private readonly url: string;
     private readonly bybitRestClientV5: RestClientV5;
 
@@ -73,6 +73,21 @@ export class BybitInvestingService extends ExchangeService {
             const positions = list.map((item) => PositionMapper(item));
 
             return positions;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async getPositionsHistory(commonId: string): Promise<any[]> {
+        try {
+            const response = await this.bybitRestClientV5.getClosedPnL({
+                category: 'linear',
+                startTime: Date.now() - 60 * 60000
+            });
+
+            const list = response.result?.list ?? [];
+
+            return list;
         } catch (error) {
             throw error;
         }

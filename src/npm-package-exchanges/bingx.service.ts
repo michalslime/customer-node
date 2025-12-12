@@ -8,6 +8,7 @@ import { Coin, Leverage, Percentage, Side, USDTCoin } from 'src/models/bybit-inv
 
 @Injectable()
 export class BingxService extends ExchangeService {
+    
     private readonly HOST = 'open-api.bingx.com';
     private readonly PROTOCOL = 'https';
 
@@ -156,6 +157,10 @@ export class BingxService extends ExchangeService {
             console.error(`Error in BingxService.getPositionInfoAsync [${commonId}]`, error);
             throw error;
         }
+    }
+
+    async getPositionsHistory(commonId: string): Promise<any> {
+        throw new Error('Method not implemented.');
     }
 
     async newOrderAsync(commonId: string, coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void> {
