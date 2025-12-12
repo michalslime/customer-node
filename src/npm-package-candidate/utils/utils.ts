@@ -22,6 +22,8 @@ function safeStringify(obj: any): string {
     const seen = new WeakSet();
 
     return JSON.stringify(obj, (key, value) => {
+        if (typeof value === "bigint") return value.toString();
+
         if (typeof value === "object" && value !== null) {
             if (seen.has(value)) return "[Circular]";
             seen.add(value);
@@ -51,7 +53,7 @@ export function toJson(data: any): string {
     }
 
     try {
-        return JSON.stringify(data);
+        return JSON.stringify(data, bigintReplacer);
     } catch {
         return safeStringify(data);
     }
@@ -59,4 +61,8 @@ export function toJson(data: any): string {
 
 export function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function bigintReplacer(_key: string, value: any) {
+    return typeof value === "bigint" ? value.toString() : value;
 }
