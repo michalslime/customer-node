@@ -434,8 +434,8 @@ function positionMapper(positionResponse: any): Position {
     const position = new Position();
 
     try {
+        position.coin = positionResponse.symbol.replace('-USDT', '') as Coin;
         position.symbol = positionResponse.symbol;
-        position.coin = positionResponse.symbol.replace('-USDT', '') + 'USDT' as Coin;
         position.side = mapBingxSide(positionResponse.positionSide);
         position.takeProfit = undefined;
         position.stopLoss = undefined;

@@ -61,14 +61,12 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                     break;
                 case 'OPEN_POSITION':
                     await this.exchange.newOrderAsync(commonId, command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
-                    console.log('position opened');
+
                     retryInvokesAsync({
                         task: async () => {
                             const positions = await this.exchange.getPositionInfoAsync(commonId);
-                            console.log(positions);
-                            console.log(command.coin);
 
-                            if (positions.findIndex(x => x.coin === command.coin)) {
+                            if (positions.findIndex(x => x.coin === command.coin) < -1) {
                                 const stopLoss = command.payload.stopLoss;
                                 console.log(stopLoss);
                                 this.exchange.setStopLossAsync(commonId, command.coin, stopLoss).catch((error) => {
