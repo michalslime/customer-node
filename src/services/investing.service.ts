@@ -1,12 +1,12 @@
 import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { Position } from 'src/models/position';
 import { CommandsService } from 'src/npm-package-candidate/commands.service';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { OctopusService } from './octopus.service';
 import { randomUUID } from 'crypto';
 import { EXCHANGE_SERVICE, ExchangeService } from '../npm-package-exchanges/exchange.service';
 import { retryInvokesAsync } from 'src/npm-package-candidate/utils/retry-invokes';
+import { Position } from 'src/npm-package-base/models';
 
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
 import { Command, CommandType } from "./command";
-import { Coin } from "src/models/bybit-investing";
+import { Coin } from "src/npm-package-base/types";
 
 export class CommandCenterService {
     private commandQueue: Command<any>[] = [];

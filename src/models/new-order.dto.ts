@@ -1,4 +1,4 @@
-import { Coin, Leverage, Percentage, Side } from "./bybit-investing";
+import { Coin, Percentage, Side, Leverage } from "src/npm-package-base/types";
 
 export class NewOrderDto {
     coin: Coin;

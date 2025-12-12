@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { Coin } from "src/models/bybit-investing";
+import { Coin } from "src/npm-package-base/types";
 
 export type CommandType =
     'SET_STOP_LOSS' |

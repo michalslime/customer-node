@@ -1,17 +1,6 @@
-import { PositionSideV5, positionTpSlModeEnum, PositionV5 } from "bybit-api";
-import { Coin, Side, USDTCoin } from "./bybit-investing";
-
-export class Position {
-    coin: Coin;
-    symbol: string;
-    side: Side;
-    takeProfit?: number;
-    stopLoss?: number;
-    price: number;
-    pnl: number;
-    size: number;
-    originalPosition: PositionV5
-}
+import { PositionSideV5, PositionV5 } from "bybit-api";
+import { USDTCoin, Coin, Side } from "../../npm-package-base/types";
+import { Position } from "../../npm-package-base/models";
 
 export function PositionMapper(positionResponse: PositionV5) {
     const position = new Position();

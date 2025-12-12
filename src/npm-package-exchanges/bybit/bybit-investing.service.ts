@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RestClientV5 } from 'bybit-api';
-import { Coin, Leverage, Percentage, Side, USDTCoin } from 'src/models/bybit-investing';
-import { Position, PositionMapper } from 'src/models/position';
+import { ExchangeService } from '../exchange.service';
 import { WalletBalance } from 'src/models/wallet';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
-import { ExchangeService } from './exchange.service';
+import { Coin, Leverage, USDTCoin, Percentage, Side } from '../../npm-package-base/types';
+import { PositionMapper } from './bybit-mapper';
+import { Position } from '../../npm-package-base/models';
 
 @Injectable()
 export class BybitInvestingService extends ExchangeService {

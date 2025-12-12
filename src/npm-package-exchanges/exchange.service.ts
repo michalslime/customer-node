@@ -1,6 +1,6 @@
-import { Coin, Leverage, Percentage, Side } from 'src/models/bybit-investing';
-import { Position } from 'src/models/position';
 import { WalletBalance } from 'src/models/wallet';
+import { Position } from 'src/npm-package-base/models';
+import { Coin, Leverage, Percentage, Side } from 'src/npm-package-base/types';
 
 export const EXCHANGE_SERVICE = 'EXCHANGE_SERVICE';
 

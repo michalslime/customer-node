@@ -1,14 +1,14 @@
 import { Controller, Get, HttpException, HttpStatus, Inject, Param, Post, Req } from '@nestjs/common';
-import type { Coin } from './models/bybit-investing';
 import { ErrorsService } from './services/errors.service';
 import { InvestingService } from './services/investing.service';
 import { ErrorCodes } from './others/error-codes.enum';
 import { CommandsService } from './npm-package-candidate/commands.service';
-import { Position } from './models/position';
 import type { Request } from 'express';
 import { OctopusService } from './services/octopus.service';
 import { SystemHeartbeat } from './npm-package-candidate/system-heartbeat';
 import { EXCHANGE_SERVICE, ExchangeService } from './npm-package-exchanges/exchange.service';
+import { Position } from './npm-package-base/models';
+import type { Coin } from './npm-package-base/types';
 
 @Controller()
 export class AppController {

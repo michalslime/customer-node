@@ -1,4 +1,4 @@
-import { Coin } from "src/models/bybit-investing";
+import { Coin } from "src/npm-package-base/types";
 
 export class ActiveStopLoss {
     coin: Coin;

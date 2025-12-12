@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { SystemHeartbeat } from "src/npm-package-candidate/system-heartbeat";
-import { BingxService } from "./bingx.service";
-import { BybitInvestingService } from "./bybit-investing.service";
+import { BingxService } from "./bingx/bingx.service";
+import { BybitInvestingService } from "./bybit/bybit-investing.service";
 import { EXCHANGE_SERVICE } from "./exchange.service";
 import { Module } from "@nestjs/common";
 
