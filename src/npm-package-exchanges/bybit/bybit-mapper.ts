@@ -2,7 +2,7 @@ import { PositionSideV5, PositionV5 } from "bybit-api";
 import { USDTCoin, Coin, Side } from "../../npm-package-base/types";
 import { Position } from "../../npm-package-base/models";
 
-export function PositionMapper(positionResponse: PositionV5) {
+export function BybitPositionMapper(positionResponse: PositionV5) {
     const position = new Position();
 
     try {

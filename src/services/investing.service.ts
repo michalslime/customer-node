@@ -66,6 +66,7 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                         task: async () => {
                             const positions = await this.exchange.getPositionInfoAsync(commonId);
                             console.log(positions);
+                            console.log(command.coin);
 
                             if (positions.findIndex(x => x.coin === command.coin)) {
                                 const stopLoss = command.payload.stopLoss;

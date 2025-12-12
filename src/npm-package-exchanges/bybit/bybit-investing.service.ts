@@ -4,7 +4,7 @@ import { ExchangeService } from '../exchange.service';
 import { WalletBalance } from 'src/models/wallet';
 import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { Coin, Leverage, USDTCoin, Percentage, Side } from '../../npm-package-base/types';
-import { PositionMapper } from './bybit-mapper';
+import { BybitPositionMapper } from './bybit-mapper';
 import { Position } from '../../npm-package-base/models';
 
 @Injectable()
@@ -71,7 +71,7 @@ export class BybitInvestingService extends ExchangeService {
             
             const list = response.result?.list ?? [];
 
-            const positions = list.map((item) => PositionMapper(item));
+            const positions = list.map((item) => BybitPositionMapper(item));
 
             return positions;
         } catch (error) {
