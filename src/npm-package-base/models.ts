@@ -7,10 +7,15 @@ export class Position {
     takeProfit?: number;
     stopLoss?: number;
     price: number;
+    avgPrice: number;
     pnl: number;
     size: number;
+    profitPercent: number;
+    updated: number;
+    leverage: number;
     originalPosition: any;
 }
+
 
 export class WalletBalance {
     availableAmount: number;
