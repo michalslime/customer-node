@@ -7,7 +7,7 @@ interface RetryOptions<T> {
     retries: number;
 }
 
-export function retryInvokes<T>({
+export function retryInvokesAsync<T>({
     task,
     initialInterval,
     multiplier,

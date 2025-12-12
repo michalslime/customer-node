@@ -6,7 +6,7 @@ import { SystemHeartbeat } from 'src/npm-package-candidate/system-heartbeat';
 import { OctopusService } from './octopus.service';
 import { randomUUID } from 'crypto';
 import { EXCHANGE_SERVICE, ExchangeService } from '../npm-package-exchanges/exchange.service';
-import { retryInvokes } from 'src/npm-package-candidate/utils/retry-invokes';
+import { retryInvokesAsync } from 'src/npm-package-candidate/utils/retry-invokes';
 
 
 @Injectable()
@@ -62,7 +62,7 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                 case 'OPEN_POSITION':
                     await this.exchange.newOrderAsync(commonId, command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
                     console.log('position opened');
-                    retryInvokes({
+                    retryInvokesAsync({
                         task: async () => {
                             const positions = await this.exchange.getPositionInfoAsync(commonId);
                             console.log(positions);
@@ -81,6 +81,8 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                         initialInterval: 3000,
                         multiplier: 1.5,
                         retries: 3
+                    }).catch((error) => {
+                        this.systemHeartbeat.logError(commonId, `Setting SL failed for ${command.coin} after few attempts`, error);
                     });
 
                     break;
