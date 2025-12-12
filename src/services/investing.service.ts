@@ -73,7 +73,6 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                                     this.systemHeartbeat.logError(commonId, `Setting SL failed for ${command.coin} at ${stopLoss}`, error);
                                 });
                             } else {
-                                console.log('Position not created yet');
                                 throw new Error('Position not created yet')
                             }
                         },
