@@ -7,6 +7,7 @@ import { randomUUID } from 'crypto';
 import { EXCHANGE_SERVICE, ExchangeService } from '../npm-package-exchanges/exchange.service';
 import { retryInvokesAsync } from 'src/npm-package-candidate/utils/retry-invokes';
 import { Position } from 'src/npm-package-base/models';
+import Decimal from 'decimal.js';
 
 
 @Injectable()
@@ -57,7 +58,24 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                     await this.exchange.setStopLossAsync(commonId, command.coin, command.payload);
                     break;
                 case 'CLOSE_POSITION':
-                    await this.exchange.closeWholePositionAsync(commonId, command.coin);
+                    if (command.payload && command.payload.positionClosePercentage) {
+                        const positionBeforeClose = (await this.getPositionsAsync()).find(x => x.coin === command.coin);
+
+                        if (!positionBeforeClose) {
+                            this.systemHeartbeat.logWarn(commonId, `No position for coin: ${command.coin}`);
+                            return;
+                        }
+
+                        const closedSize = new Decimal(positionBeforeClose.size)
+                            .mul(command.payload.positionClosePercentage)
+                            .toDecimalPlaces(4, Decimal.ROUND_DOWN)
+                            .toNumber();
+
+                        await this.exchange.closePositionAsync(commonId, command.coin, closedSize);
+                    } else { 
+                        await this.exchange.closeWholePositionAsync(commonId, command.coin); 
+                    }
+
                     break;
                 case 'OPEN_POSITION':
                     await this.exchange.newOrderAsync(commonId, command.coin, command.payload.percentage, command.payload.side, command.payload.leverage);
