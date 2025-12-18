@@ -9,9 +9,10 @@ export abstract class ExchangeService {
   abstract getPositionInfoAsync(commonId: string): Promise<Position[]>;
   abstract getPositionsHistory(commonId: string): Promise<any[]>;
   abstract newOrderAsync(commonId: string, coin: Coin, percentage: Percentage, side: Side, leverage: Leverage): Promise<void>;
-  abstract openPositionAsync(commonId: string, coin: Coin, side: Side, qty: number): Promise<void>;
+  abstract openPositionAsync(commonId: string, coin: Coin, side: Side, qty: string): Promise<void>;
   abstract getPriceAsync(commonId: string, coin: Coin): Promise<number>;
   abstract closeWholePositionAsync(commonId: string, coin: Coin): Promise<void>;
-  abstract closePositionAsync(commonId: string, coin: Coin, quantity?: number): Promise<void>;
+  abstract closePositionAsync(commonId: string, coin: Coin, quantity?: string): Promise<void>;
   abstract setStopLossAsync(commonId: string, coin: Coin, stopLossPrice: number): Promise<void>;
+  abstract getProperOrderSize(commonId: string, coin: Coin, qty: number): Promise<string>;
 }

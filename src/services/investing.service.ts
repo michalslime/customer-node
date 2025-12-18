@@ -71,7 +71,9 @@ export class InvestingService implements OnModuleInit, OnModuleDestroy {
                             .toDecimalPlaces(4, Decimal.ROUND_DOWN)
                             .toNumber();
 
-                        await this.exchange.closePositionAsync(commonId, command.coin, closedSize);
+                        const properSize = await this.exchange.getProperOrderSize(command.commonId, command.coin, closedSize);
+
+                        await this.exchange.closePositionAsync(commonId, command.coin, properSize);
                     } else { 
                         await this.exchange.closeWholePositionAsync(commonId, command.coin); 
                     }

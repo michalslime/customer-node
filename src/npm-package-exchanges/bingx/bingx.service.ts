@@ -171,13 +171,17 @@ export class BingxService extends ExchangeService {
             
             const qty = (wallet.availableAmount * ((percentage * leverage) / 100)) / price;
 
-            await this.openPositionAsync(commonId, coin, side, qty);
+            await this.openPositionAsync(commonId, coin, side, qty.toString());
         } catch (error) {
             throw error;
         }
     }
 
-    async openPositionAsync(commonId: string, coin: Coin, side: Side, qty: number): Promise<void> {
+    async getProperOrderSize(commonId: string, coin: Coin, qty: number): Promise<string> {
+        return qty.toString();
+    }
+
+    async openPositionAsync(commonId: string, coin: Coin, side: Side, qty: string): Promise<void> {
         try {
             const path = '/openApi/swap/v2/trade/order';
             const method = 'POST';
@@ -286,7 +290,7 @@ export class BingxService extends ExchangeService {
         return this.closePositionAsync(commonId, coin, undefined);
     }
 
-    async closePositionAsync(commonId: string, coin: Coin, quantity?: number): Promise<void> {
+    async closePositionAsync(commonId: string, coin: Coin, quantity?: string): Promise<void> {
         const symbol = coin + '-' + USDTCoin;
 
         try {
@@ -296,7 +300,7 @@ export class BingxService extends ExchangeService {
                 return;
             }
 
-            quantity = quantity === undefined ? position.size : quantity;
+            quantity = quantity === undefined ? position.size.toString() : quantity;
 
             await this.openPositionAsync(commonId, coin, position.side === 'Buy' ? 'Sell' : 'Buy', quantity);
         } catch (error) {
