@@ -119,8 +119,9 @@ export class BybitInvestingService extends ExchangeService {
                 const stepNum = parseFloat(step);
                 const precision = step.includes('.') ? step.split('.')[1].length : 0;
 
-                const formatted = (Math.floor(value / stepNum) * stepNum).toFixed(precision);
-                return formatted;
+                const calculatedValue = Math.floor(value / stepNum) * stepNum;
+
+                return parseFloat(calculatedValue.toFixed(precision)).toString();
             };
 
             if (!this.instrumentDetailsMap.has(symbol)) {
