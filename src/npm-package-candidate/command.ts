@@ -13,7 +13,7 @@ export type CommandType =
     'RESTORE_DATA_FROM_ONCHAIN' |
     'SAVE_HISTORICAL_POSITION' |
     'LOGIC_BOX_CLOSE_POSITION_PARTIALLY' |
-    'ADD_MESSAGE' | 
+    'ADD_MESSAGE' |
     'SET_HARD_STOP_LOSS';
 
 export class Command<T> {
@@ -21,7 +21,7 @@ export class Command<T> {
     parentId: string | undefined;
     commonId: string;
     createdTimestamp: number;
-    coin: Coin;
+    coin: Coin | string;
     type: CommandType;
     payload?: T;
 }

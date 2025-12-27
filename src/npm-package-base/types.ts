@@ -7,3 +7,8 @@ export type Leverage = 1 | 2 | 5 | 10 | 15 | 20;
 export type Coin = 'BTC' | 'ETH' | 'USDT' | 'DOGE' | 'ICP' | 'SOL';
 
 export const USDTCoin: Coin = 'USDT';
+
+export class LogicBoxSummary {
+    logicName: string;
+    summary: string;
+}

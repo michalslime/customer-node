@@ -1,7 +1,7 @@
 import { Coin, Side } from "./types";
 
 export class Position {
-    coin: Coin;
+    coin: Coin | string;
     symbol: string;
     side: Side;
     takeProfit?: number;

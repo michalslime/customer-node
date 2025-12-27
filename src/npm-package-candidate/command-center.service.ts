@@ -21,7 +21,7 @@ export class CommandCenterService {
         return commandsToReturn;
     }
 
-    public static generateCommand<T>(commonId: string, coin: Coin, type: CommandType, payload?: T): Command<T> {
+    public static generateCommand<T>(commonId: string, coin: Coin | string, type: CommandType, payload?: T): Command<T> {
         const command = new Command<T>();
         command.id = crypto
             .randomUUID()
