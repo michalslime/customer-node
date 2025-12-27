@@ -6,6 +6,12 @@ import { toJson, trimTrailingSlash } from "./utils/utils";
 
 type Level = 'info' | 'warning' | 'error';
 
+export type LogFunctions = {
+    logError: (commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string) => Promise<void>;
+    logWarn: (commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string) => Promise<void>;
+    logInfo: (commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string) => Promise<void>;
+};
+
 class LogEntry {
     commonId: string;
     applicationName: string;
@@ -57,6 +63,14 @@ export class SystemHeartbeat implements OnModuleInit, OnModuleDestroy {
 
     async logInfo(commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {
         this.log('info', commonId, message, payload, sendEmail, title);
+    }
+
+    getLogFunctions(): LogFunctions {
+        return {
+            logError: this.logError.bind(this),
+            logWarn: this.logWarn.bind(this),
+            logInfo: this.logInfo.bind(this)
+        };
     }
 
     private async log(level: Level, commonId: string, message: string, payload?: any, sendEmail?: boolean, title?: string): Promise<void> {

@@ -66,3 +66,11 @@ export function delay(ms: number) {
 function bigintReplacer(_key: string, value: any) {
     return typeof value === "bigint" ? value.toString() : value;
 }
+
+export function isUON(value: any) {
+    if (value === undefined || value === null) {
+        return true;
+    } else {
+        return false;
+    }
+}

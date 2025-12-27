@@ -29,6 +29,7 @@
     "bybit-api": "^4.0.1",
     "crypto-js": "^4.2.0",
     "decimal.js": "^10.6.0",
+    "json-bigint": "^1.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

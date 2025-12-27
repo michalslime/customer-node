@@ -4,10 +4,11 @@ import CryptoJS from 'crypto-js';
 import { ExchangeService } from '../exchange.service';
 import { Coin, Leverage, Percentage, Side, USDTCoin } from '../../npm-package-base/types';
 import { Position, WalletBalance } from '../../npm-package-base/models';
+import JSONBig from 'json-bigint';
 
 @Injectable()
 export class BingxService extends ExchangeService {
-    
+
     private readonly HOST = 'open-api.bingx.com';
     private readonly PROTOCOL = 'https';
 
@@ -43,7 +44,16 @@ export class BingxService extends ExchangeService {
                 headers: {
                     'X-BX-APIKEY': this.apiKey,
                 },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }],
             });
+
+            this.handleBingxResponse('getWalletBalanceAsync', response);
 
             const list = response.data?.data;
 
@@ -99,11 +109,16 @@ export class BingxService extends ExchangeService {
                 headers: {
                     'X-BX-APIKEY': this.apiKey,
                 },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }],
             });
 
-            if (response.data.code !== 0) {
-                throw new Error(`BingX leverage error: ${response.data.msg}`);
-            }
+            this.handleBingxResponse('setLeverageAsync', response);
 
         } catch (error) {
             console.error(`Error in BingxService.setLeverageAsync [${commonId}]`, error);
@@ -136,11 +151,16 @@ export class BingxService extends ExchangeService {
                 headers: {
                     'X-BX-APIKEY': this.apiKey,
                 },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }],
             });
 
-            if (response.data.code !== 0) {
-                throw new Error(`BingX getPositionInfo error: ${response.data.msg}`);
-            }
+            this.handleBingxResponse('getPositionInfoAsync', response);
 
             const data = response.data.data;
 
@@ -168,7 +188,7 @@ export class BingxService extends ExchangeService {
 
             await this.setDualPositionMode(false);
             await this.setLeverageAsync(commonId, coin, leverage);
-            
+
             const qty = (wallet.availableAmount * ((percentage * leverage) / 100)) / price;
 
             await this.openPositionAsync(commonId, coin, side, qty.toString());
@@ -214,13 +234,18 @@ export class BingxService extends ExchangeService {
                 method,
                 url,
                 headers: { 'X-BX-APIKEY': this.apiKey },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }],
             });
 
-            const raw = response.data;
+            this.handleBingxResponse('openPositionAsync', response);
 
-            if (raw.code !== 0) {
-                throw new Error(`BingX openPosition error: ${raw.msg}`);
-            }
+            const raw = response.data;
 
             return;
 
@@ -260,11 +285,14 @@ export class BingxService extends ExchangeService {
                 headers: {
                     'X-BX-APIKEY': this.apiKey,
                 },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }],
             });
-
-            if (response.data.code !== 0) {
-                throw new Error(`BingX getPrice error: ${response.data.msg}`);
-            }
 
             const result = response.data.data;
 
@@ -318,6 +346,13 @@ export class BingxService extends ExchangeService {
             throw new Error(`No open position found for ${symbol}.`);
         }
 
+        const stopLossOrders = await this.getStopLossOrders(coin);
+
+        if (stopLossOrders.length > 0) {
+            const stopLossOrderId = stopLossOrders[0].orderId;
+            await this.cancelOrder(coin, stopLossOrderId);
+        }
+
         const positionSide = "BOTH";
         const side = pos.side === 'Buy' ? 'SELL' : 'BUY'; // SL logic
 
@@ -354,15 +389,122 @@ export class BingxService extends ExchangeService {
             headers: {
                 'X-BX-APIKEY': this.apiKey,
             },
-            transformResponse: (resp: any) => {
-                return resp;
-            }
+            transformResponse: [(data: any) => {
+                try {
+                    return JSONBig({ storeAsString: true }).parse(data);
+                } catch (err) {
+                    return data;
+                }
+            }],
         };
 
         const resp = await axios(config);
 
+        this.handleBingxResponse('setStopLossAsync', resp);
+
         if (resp.status !== 200) {
             throw new Error(`BingX SL failed: ${resp.status}`);
+        }
+    }
+
+    private async getStopLossOrders(coin: Coin | string): Promise<any[]> {
+        const method = "GET";
+        const timestamp = Date.now();
+        const symbol = coin + '-USDT';
+
+        const payload = {
+            symbol: symbol,
+            type: "STOP_MARKET"
+        };
+
+        try {
+            const paramsStr = this.buildParameters(payload, timestamp, false);
+            const paramsEncoded = this.buildParameters(payload, timestamp, true);
+
+            const sign = CryptoJS.enc.Hex.stringify(
+                CryptoJS.HmacSHA256(paramsStr, this.apiSecret)
+            );
+
+            const url = `https://open-api.bingx.com/openApi/swap/v2/trade/openOrders?${paramsEncoded}&signature=${sign}`;
+
+            const config = {
+                method,
+                url,
+                headers: {
+                    "X-BX-APIKEY": this.apiKey,
+                },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }]
+            };
+
+            const resp = await axios(config);
+
+            this.handleBingxResponse('getStopLossOrders', resp);
+
+            console.log(resp);
+
+            const orders = resp.data?.data?.orders || [];
+
+            return orders;
+
+        } catch (error: any) {
+            console.error(`[getStopLossOrders] Error for ${symbol}:`, error.message);
+            throw error;
+        }
+    }
+
+    private async cancelOrder(coin: Coin | string, orderId: string): Promise<any> {
+        const method = "DELETE";
+        const timestamp = Date.now();
+        const symbol = coin + '-USDT';
+
+        // Payload dla zlecenia anulowania
+        const payload = {
+            orderId: orderId,
+            symbol: symbol
+        };
+
+        try {
+            const paramsStr = this.buildParameters(payload, timestamp, false);
+            const paramsEncoded = this.buildParameters(payload, timestamp, true);
+
+            const sign = CryptoJS.enc.Hex.stringify(
+                CryptoJS.HmacSHA256(paramsStr, this.apiSecret)
+            );
+
+            const url = `https://open-api.bingx.com/openApi/swap/v2/trade/order?${paramsEncoded}&signature=${sign}`;
+
+            const config = {
+                method,
+                url,
+                headers: {
+                    "X-BX-APIKEY": this.apiKey,
+                },
+                transformResponse: [(data: any) => {
+                    try {
+                        return JSONBig({ storeAsString: true }).parse(data);
+                    } catch (err) {
+                        return data;
+                    }
+                }]
+            };
+
+            const resp = await axios(config);
+
+            this.handleBingxResponse('cancelOrder', resp);
+
+            console.log(`Pomyślnie anulowano zlecenie ${orderId} dla ${symbol}`);
+
+            return resp.data?.data;
+
+        } catch (error: any) {
+            console.error(`[cancelOrder] Error for ${symbol} (ID: ${orderId}):`, error.message);
+            throw error;
         }
     }
 
@@ -398,17 +540,18 @@ export class BingxService extends ExchangeService {
             headers: {
                 "X-BX-APIKEY": this.apiKey,
             },
-            transformResponse: (resp: any) => {
-                // big-int debug (zalecane przez BingX)
-                return resp;
-            },
+            transformResponse: [(data: any) => {
+                try {
+                    return JSONBig({ storeAsString: true }).parse(data);
+                } catch (err) {
+                    return data;
+                }
+            }],
         };
 
         const resp = await axios(config);
 
-        if (resp.status !== 200) {
-            throw new Error(`Failed to set dual mode: ${resp.status}`);
-        }
+        this.handleBingxResponse('setDualPositionMode', resp);
     }
 
     private buildParameters(payload: any, timestamp: number, urlEncode = false): string {
@@ -432,6 +575,17 @@ export class BingxService extends ExchangeService {
 
         return params;
     }
+
+    private handleBingxResponse(methodName: string, resp: any) {
+        const code = resp?.data?.code;
+
+        if (typeof code !== 'number' || code !== 0) {
+            const errorMsg = resp?.data?.msg || "Unknown error";
+            const errorCode = typeof code === 'number' ? code : "Invalid Code Format";
+
+            throw new Error(`BingX ${methodName} error (Code: ${errorCode}): ${errorMsg}`);
+        }
+    }
 }
 
 function positionMapper(positionResponse: any): Position {
@@ -443,9 +597,11 @@ function positionMapper(positionResponse: any): Position {
         position.side = mapBingxSide(positionResponse.positionSide);
         position.takeProfit = undefined;
         position.stopLoss = undefined;
-        position.price = parseFloat(positionResponse.avgPrice);
+        position.avgPrice = parseFloat(positionResponse.avgPrice);
+        position.price = parseFloat(positionResponse.markPrice);
         position.pnl = parseFloat(positionResponse.unrealizedProfit);
         position.size = parseFloat(positionResponse.positionAmt);
+        position.leverage = positionResponse.leverage;
         position.originalPosition = positionResponse;
 
     } catch (err) {
